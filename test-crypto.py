@@ -13,51 +13,14 @@ Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 
 # Import usefull libs
 import ioctlh
+from cryptodevh import *
+from ctypes import *
 import fcntl
 import os
 import sys
-from ctypes import *
-
-"""
-Create 2 structs needed to encrypt/decrypt.
-Not all structs are implemented yet.
-You can find original c structs in cryptodev.h
-"""
-
-
-class crypt_op(Structure):
-
-    _fields_ = [("ses",  c_uint32),
-                ("op", c_uint16),
-                ("flags", c_uint16),
-                ("lend", c_uint32),
-                ("src", POINTER(c_uint8)),
-                ("dst", POINTER(c_uint8)),
-                ("mac", POINTER(c_uint8)),
-                ("iv", POINTER(c_uint8))]
-
-
-class session_op(Structure):
-    _fields_ = [("cipher",  c_uint32),
-                ("mac",  c_uint32),
-                ("keylen",  c_uint32),
-                ("key",   POINTER(c_uint8)),
-                ("mackeylen",  c_uint32),
-                ("mackey",  POINTER(c_uint8)),
-                ("ses", c_uint32)]
-
-"""
-Some defined variables from cryptodev.h needed
-to encrypt/decrypt.
-Only those needed exist here.
-"""
-
-CRYPTO_RIJNDAEL128_CBC = 11
-CRYPTO_AES_CBC = CRYPTO_RIJNDAEL128_CBC
-COP_ENCRYPT = 0
-COP_DECRYPT = 1
-CIOCGSESSION = ioctlh._IOWR(ord('c'), 102, sizeof(session_op))
-CIOCCRYPT = ioctlh._IOWR(ord('c'), 104, sizeof(crypt_op))
+import traceback
+import random
+import string
 
 
 # Define buffer size, key size and block size
@@ -74,8 +37,8 @@ class Data:
         self.inpt = create_string_buffer(inp, BUFSIZE)
         self.iv = create_string_buffer(iv, BLOCKSIZE)
         self.key = create_string_buffer(key, KEYSIZE)
-        self.encrypted = create_string_buffer("", BUFSIZE)
-        self.decrypted = create_string_buffer("", BUFSIZE)
+        self.encrypted = create_string_buffer('\0', BUFSIZE)
+        self.decrypted = create_string_buffer('\0', BUFSIZE)
 
 # Function to init session
 def initsess(mydata, sess, fd):
@@ -121,22 +84,26 @@ def printMessage(msg1, msg2):
     print msg1 + " (hex)\n%s\n" % hexMsg
     print "*" * 100
 
+# Usefull function to generate random string
+def randomString(size, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 # Function to test encryption/decryption
 def test(fd):
-    inpt = "Hello cryptodev!"
-    key = "qoelqielwidkrmqm"
-    iv = "qoelqi1e2l3wimqm"
+    inpt = randomString(BUFSIZE)
+    key = randomString(KEYSIZE)
+    iv = randomString(BLOCKSIZE)
 
     mydata = Data(inpt, iv, key)
     sess = session_op()
     cryp = crypt_op()
 
     initsess(mydata, sess, fd)
-    printMessage("Original data", mydata.inpt.value)
+    printMessage("Original data", mydata.inpt)
     encrypt(mydata, sess, cryp, fd)
-    printMessage("Encrypted data", mydata.encrypted.value)
+    printMessage("Encrypted data", mydata.encrypted)
     decrypt(mydata, sess, cryp, fd)
-    printMessage("Decrypted data", mydata.decrypted.value)
+    printMessage("Decrypted data", mydata.decrypted)
     if mydata.decrypted.value == mydata.inpt.value:
         print "Sucess!"
     else:
@@ -152,6 +119,7 @@ def main():
         print str(type(e)) + str(e)
     except Exception, e:
         print str(type(e)) + str(e)
+        print traceback.format_exc()
 
 if __name__ == "__main__":
     main()
