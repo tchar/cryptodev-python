@@ -89,7 +89,7 @@ def randomString(size, chars=string.ascii_uppercase + string.digits):
 
 # Function to test encryption/decryption
 def test(fd):
-    inpt = randomString(256)
+    inpt = randomString(BUFSIZE)
     key = randomString(KEYSIZE)
     iv = randomString(BLOCKSIZE)
 
