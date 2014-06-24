@@ -81,7 +81,7 @@ def printMessage(msg1, msg2):
 
 
 def getString(buf):
-    return "".join(c for c in buf)
+    return "".join(buf)
 
 # Usefull function to generate random string
 def randomString(size, chars=string.ascii_uppercase + string.digits):
