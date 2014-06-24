@@ -79,6 +79,10 @@ def printMessage(msg1, msg2):
     print msg1 + " (hex)\n%s\n" % hexMsg
     print "*" * 100
 
+
+def getString(buf):
+    return "".join(c for c in buf)
+
 # Usefull function to generate random string
 def randomString(size, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -99,7 +103,7 @@ def test(fd):
     printMessage("Encrypted data", mydata.encrypted)
     decrypt(mydata, sess, cryp, fd)
     printMessage("Decrypted data", mydata.decrypted)
-    if mydata.decrypted.value == mydata.inpt.value:
+    if getString(mydata.decrypted) == getString(mydata.inpt.value):
         print "Sucess!"
     else:
         print "Looser@"
