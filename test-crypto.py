@@ -74,14 +74,14 @@ def decrypt(mydata, sess, cryp, fd):
 
 # Function to print data in hex
 def printMessage(msg1, msg2):
-    hexMsg = ":".join("{:02x}".format(ord(c)) for c in msg2)
+    hexMsg = ":".join("{:02x}".format(ord(c)) for c in msg2 if c != '\0')
     print "*" * 100
     print msg1 + " (hex)\n%s\n" % hexMsg
     print "*" * 100
 
 
 def getString(buf):
-    return "".join(buf)
+    return "".join(c for c in buf if c != '\0')
 
 # Usefull function to generate random string
 def randomString(size, chars=string.ascii_uppercase + string.digits):
@@ -89,7 +89,7 @@ def randomString(size, chars=string.ascii_uppercase + string.digits):
 
 # Function to test encryption/decryption
 def test(fd):
-    inpt = randomString(BUFSIZE)
+    inpt = randomString(256)
     key = randomString(KEYSIZE)
     iv = randomString(BLOCKSIZE)
 
