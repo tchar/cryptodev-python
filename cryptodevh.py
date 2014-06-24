@@ -102,7 +102,7 @@ class session_op(Structure):
 class session_info_op(Structure):
     class alg_info(Structure):
         _fields_ = [("cra_name ", c_char * CRYPTODEV_MAX_ALG_NAME),
-                    ("cra_driver_name_", c_char * CRYPTODEV_MAX_ALG_NAME)]
+                    ("cra_driver_name", c_char * CRYPTODEV_MAX_ALG_NAME)]
     _fields_ = [("ses", c_uint32),
                 ("cipher_info", alg_info),
                 ("has_info", alg_info),
