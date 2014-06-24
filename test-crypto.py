@@ -1,18 +1,13 @@
 """
 First attempt to build a python binding to
 communicate with cryptodev using ctypes
-ioctlh contains usefull functions in python
-equivalent to ioctl.h's header:
-http://lxr.free-electrons.com/source/include/uapi/asm-generic/ioctl.h#L79
-Copy of ioctlh can be found here:
-from http://code.activestate.com/recipes/578225-linux-ioctl-numbers-in-python/
-Created by Dima Tisnek
+cryptodevh.py contains some definitions defined
+in cryptodev.h
 
 Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 """
 
 # Import usefull libs
-import ioctlh
 from cryptodevh import *
 from ctypes import *
 import fcntl
