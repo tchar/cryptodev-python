@@ -1,7 +1,7 @@
-'''Wrapper for ioctl.h
+'''Wrapper for cryptodev.h
 
 Generated with:
-ctypesgen.py /usr/include/linux/ioctl.h -o ioctl.py
+ctypesgen.py cryptodev.h -o cryptodevh.py
 
 Do not modify this file.
 '''
@@ -606,177 +606,476 @@ add_library_search_dirs([])
 
 # No modules
 
-# /usr/include/asm-generic/ioctl.h: 22
+__u8 = c_ubyte # /usr/include/asm-generic/int-ll64.h: 20
+
+__u16 = c_ushort # /usr/include/asm-generic/int-ll64.h: 23
+
+__u32 = c_uint # /usr/include/asm-generic/int-ll64.h: 26
+
+enum_cryptodev_crypto_op_t = c_int # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_DES_CBC = 1 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_3DES_CBC = 2 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_BLF_CBC = 3 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_CAST_CBC = 4 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SKIPJACK_CBC = 5 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_MD5_HMAC = 6 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA1_HMAC = 7 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_RIPEMD160_HMAC = 8 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_MD5_KPDK = 9 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA1_KPDK = 10 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_RIJNDAEL128_CBC = 11 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_AES_CBC = CRYPTO_RIJNDAEL128_CBC # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_ARC4 = 12 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_MD5 = 13 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA1 = 14 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_DEFLATE_COMP = 15 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_NULL = 16 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_LZS_COMP = 17 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_256_HMAC = 18 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_384_HMAC = 19 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_512_HMAC = 20 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_AES_CTR = 21 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_AES_XTS = 22 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_AES_ECB = 23 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_AES_GCM = 50 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_CAMELLIA_CBC = 101 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_RIPEMD160 = (CRYPTO_CAMELLIA_CBC + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_224 = (CRYPTO_RIPEMD160 + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_256 = (CRYPTO_SHA2_224 + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_384 = (CRYPTO_SHA2_256 + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_512 = (CRYPTO_SHA2_384 + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_SHA2_224_HMAC = (CRYPTO_SHA2_512 + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+CRYPTO_ALGORITHM_ALL = (CRYPTO_SHA2_224_HMAC + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 19
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 80
+class struct_session_op(Structure):
+    pass
+
+struct_session_op.__slots__ = [
+    'cipher',
+    'mac',
+    'keylen',
+    'key',
+    'mackeylen',
+    'mackey',
+    'ses',
+]
+struct_session_op._fields_ = [
+    ('cipher', __u32),
+    ('mac', __u32),
+    ('keylen', __u32),
+    ('key', POINTER(__u8)),
+    ('mackeylen', __u32),
+    ('mackey', POINTER(__u8)),
+    ('ses', __u32),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 98
+class struct_alg_info(Structure):
+    pass
+
+struct_alg_info.__slots__ = [
+    'cra_name',
+    'cra_driver_name',
+]
+struct_alg_info._fields_ = [
+    ('cra_name', c_char * 64),
+    ('cra_driver_name', c_char * 64),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 94
+class struct_session_info_op(Structure):
+    pass
+
+struct_session_info_op.__slots__ = [
+    'ses',
+    'cipher_info',
+    'hash_info',
+    'alignmask',
+    'flags',
+]
+struct_session_info_op._fields_ = [
+    ('ses', __u32),
+    ('cipher_info', struct_alg_info),
+    ('hash_info', struct_alg_info),
+    ('alignmask', __u16),
+    ('flags', __u32),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 120
+class struct_crypt_op(Structure):
+    pass
+
+struct_crypt_op.__slots__ = [
+    'ses',
+    'op',
+    'flags',
+    'len',
+    'src',
+    'dst',
+    'mac',
+    'iv',
+]
+struct_crypt_op._fields_ = [
+    ('ses', __u32),
+    ('op', __u16),
+    ('flags', __u16),
+    ('len', __u32),
+    ('src', POINTER(__u8)),
+    ('dst', POINTER(__u8)),
+    ('mac', POINTER(__u8)),
+    ('iv', POINTER(__u8)),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 134
+class struct_crypt_auth_op(Structure):
+    pass
+
+struct_crypt_auth_op.__slots__ = [
+    'ses',
+    'op',
+    'flags',
+    'len',
+    'auth_len',
+    'auth_src',
+    'src',
+    'dst',
+    'tag',
+    'tag_len',
+    'iv',
+    'iv_len',
+]
+struct_crypt_auth_op._fields_ = [
+    ('ses', __u32),
+    ('op', __u16),
+    ('flags', __u16),
+    ('len', __u32),
+    ('auth_len', __u32),
+    ('auth_src', POINTER(__u8)),
+    ('src', POINTER(__u8)),
+    ('dst', POINTER(__u8)),
+    ('tag', POINTER(__u8)),
+    ('tag_len', __u32),
+    ('iv', POINTER(__u8)),
+    ('iv_len', __u32),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 232
+class struct_crparam(Structure):
+    pass
+
+struct_crparam.__slots__ = [
+    'crp_p',
+    'crp_nbits',
+]
+struct_crparam._fields_ = [
+    ('crp_p', POINTER(__u8)),
+    ('crp_nbits', __u32),
+]
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 240
+class struct_crypt_kop(Structure):
+    pass
+
+struct_crypt_kop.__slots__ = [
+    'crk_op',
+    'crk_status',
+    'crk_iparams',
+    'crk_oparams',
+    'crk_pad1',
+    'crk_param',
+]
+struct_crypt_kop._fields_ = [
+    ('crk_op', __u32),
+    ('crk_status', __u32),
+    ('crk_iparams', __u16),
+    ('crk_oparams', __u16),
+    ('crk_pad1', __u32),
+    ('crk_param', struct_crparam * 8),
+]
+
+enum_cryptodev_crk_op_t = c_int # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_MOD_EXP = 0 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_MOD_EXP_CRT = 1 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_DSA_SIGN = 2 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_DSA_VERIFY = 3 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_DH_COMPUTE_KEY = 4 # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+CRK_ALGORITHM_ALL = (CRK_DH_COMPUTE_KEY + 1) # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 249
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 14
 try:
-    _IOC_NRBITS = 8
+    CRYPTO_HMAC_MAX_KEY_LEN = 512
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 23
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 15
 try:
-    _IOC_TYPEBITS = 8
+    CRYPTO_CIPHER_MAX_KEY_LEN = 64
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 31
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 56
 try:
-    _IOC_SIZEBITS = 14
+    CRYPTO_ALGORITHM_MAX = (CRYPTO_ALGORITHM_ALL - 1)
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 35
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 59
 try:
-    _IOC_DIRBITS = 2
+    DES_BLOCK_LEN = 8
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 38
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 60
 try:
-    _IOC_NRMASK = ((1 << _IOC_NRBITS) - 1)
+    DES3_BLOCK_LEN = 8
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 39
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 61
 try:
-    _IOC_TYPEMASK = ((1 << _IOC_TYPEBITS) - 1)
+    RIJNDAEL128_BLOCK_LEN = 16
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 40
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 62
 try:
-    _IOC_SIZEMASK = ((1 << _IOC_SIZEBITS) - 1)
+    AES_BLOCK_LEN = RIJNDAEL128_BLOCK_LEN
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 41
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 63
 try:
-    _IOC_DIRMASK = ((1 << _IOC_DIRBITS) - 1)
+    CAMELLIA_BLOCK_LEN = 16
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 43
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 64
 try:
-    _IOC_NRSHIFT = 0
+    BLOWFISH_BLOCK_LEN = 8
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 44
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 65
 try:
-    _IOC_TYPESHIFT = (_IOC_NRSHIFT + _IOC_NRBITS)
+    SKIPJACK_BLOCK_LEN = 8
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 45
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 66
 try:
-    _IOC_SIZESHIFT = (_IOC_TYPESHIFT + _IOC_TYPEBITS)
+    CAST128_BLOCK_LEN = 8
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 46
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 69
 try:
-    _IOC_DIRSHIFT = (_IOC_SIZESHIFT + _IOC_SIZEBITS)
+    EALG_MAX_BLOCK_LEN = 16
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 54
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 72
 try:
-    _IOC_NONE = 0
+    AALG_MAX_RESULT_LEN = 64
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 58
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 75
 try:
-    _IOC_WRITE = 1
+    CRYPTODEV_MAX_ALG_NAME = 64
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 62
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 77
 try:
-    _IOC_READ = 2
+    HASH_MAX_LEN = 64
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 65
-def _IOC(dir, type, nr, size):
-    return ((((dir << _IOC_DIRSHIFT) | (type << _IOC_TYPESHIFT)) | (nr << _IOC_NRSHIFT)) | (size << _IOC_SIZESHIFT))
-
-# /usr/include/asm-generic/ioctl.h: 71
-def _IOC_TYPECHECK(t):
-    return sizeof(t)
-
-# /usr/include/asm-generic/ioctl.h: 74
-def _IO(type, nr):
-    return (_IOC (_IOC_NONE, type, nr, 0))
-
-# /usr/include/asm-generic/ioctl.h: 75
-def _IOR(type, nr, size):
-    return (_IOC (_IOC_READ, type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 76
-def _IOW(type, nr, size):
-    return (_IOC (_IOC_WRITE, type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 77
-def _IOWR(type, nr, size):
-    return (_IOC ((_IOC_READ | _IOC_WRITE), type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 78
-def _IOR_BAD(type, nr, size):
-    return (_IOC (_IOC_READ, type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 79
-def _IOW_BAD(type, nr, size):
-    return (_IOC (_IOC_WRITE, type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 80
-def _IOWR_BAD(type, nr, size):
-    return (_IOC ((_IOC_READ | _IOC_WRITE), type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 83
-def _IOC_DIR(nr):
-    return ((nr >> _IOC_DIRSHIFT) & _IOC_DIRMASK)
-
-# /usr/include/asm-generic/ioctl.h: 84
-def _IOC_TYPE(nr):
-    return ((nr >> _IOC_TYPESHIFT) & _IOC_TYPEMASK)
-
-# /usr/include/asm-generic/ioctl.h: 85
-def _IOC_NR(nr):
-    return ((nr >> _IOC_NRSHIFT) & _IOC_NRMASK)
-
-# /usr/include/asm-generic/ioctl.h: 86
-def _IOC_SIZE(nr):
-    return ((nr >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
-
-# /usr/include/asm-generic/ioctl.h: 90
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 114
 try:
-    IOC_IN = (_IOC_WRITE << _IOC_DIRSHIFT)
+    SIOP_FLAG_KERNEL_DRIVER_ONLY = 1
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 91
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 116
 try:
-    IOC_OUT = (_IOC_READ << _IOC_DIRSHIFT)
+    COP_ENCRYPT = 0
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 92
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 117
 try:
-    IOC_INOUT = ((_IOC_WRITE | _IOC_READ) << _IOC_DIRSHIFT)
+    COP_DECRYPT = 1
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 93
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 209
 try:
-    IOCSIZE_MASK = (_IOC_SIZEMASK << _IOC_SIZESHIFT)
+    COP_FLAG_NONE = (0 << 0)
 except:
     pass
 
-# /usr/include/asm-generic/ioctl.h: 94
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 210
 try:
-    IOCSIZE_SHIFT = _IOC_SIZESHIFT
+    COP_FLAG_UPDATE = (1 << 0)
 except:
     pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 211
+try:
+    COP_FLAG_FINAL = (1 << 1)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 212
+try:
+    COP_FLAG_WRITE_IV = (1 << 2)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 213
+try:
+    COP_FLAG_NO_ZC = (1 << 3)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 214
+try:
+    COP_FLAG_AEAD_TLS_TYPE = (1 << 4)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 216
+try:
+    COP_FLAG_AEAD_SRTP_TYPE = (1 << 5)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 218
+try:
+    COP_FLAG_RESET = (1 << 6)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 228
+try:
+    CRYPTO_ALG_FLAG_SUPPORTED = 1
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 229
+try:
+    CRYPTO_ALG_FLAG_RNG_ENABLE = 2
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 230
+try:
+    CRYPTO_ALG_FLAG_DSA_SHA = 4
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 237
+try:
+    CRK_MAXPARAM = 8
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 258
+try:
+    CRK_ALGORITHM_MAX = (CRK_ALGORITHM_ALL - 1)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 262
+try:
+    CRF_MOD_EXP = (1 << CRK_MOD_EXP)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 263
+try:
+    CRF_MOD_EXP_CRT = (1 << CRK_MOD_EXP_CRT)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 264
+try:
+    CRF_DSA_SIGN = (1 << CRK_DSA_SIGN)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 265
+try:
+    CRF_DSA_VERIFY = (1 << CRK_DSA_VERIFY)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 266
+try:
+    CRF_DH_COMPUTE_KEY = (1 << CRK_DH_COMPUTE_KEY)
+except:
+    pass
+
+# /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 281
+try:
+    CRIOGET_NOT_NEEDED = 1
+except:
+    pass
+
+session_op = struct_session_op # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 80
+
+alg_info = struct_alg_info # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 98
+
+session_info_op = struct_session_info_op # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 94
+
+crypt_op = struct_crypt_op # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 120
+
+crypt_auth_op = struct_crypt_auth_op # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 134
+
+crparam = struct_crparam # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 232
+
+crypt_kop = struct_crypt_kop # /home/tilemachos/git/others/ctypesgen-read-only/cryptodev.h: 240
 
 # No inserted files
 
