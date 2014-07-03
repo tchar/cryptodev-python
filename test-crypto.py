@@ -7,9 +7,9 @@ in cryptodev.h
 Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 """
 
-# Import usefull libs
-from cryptodevh import *
-from ctypes import *
+# Import useful libs
+from cryptodev import CIOCCRYPT, CIOCGSESSION, COP_ENCRYPT, COP_DECRYPT, crypt_op, session_op, CRYPTO_AES_CBC
+from ctypes import c_uint16, c_uint32, c_uint8, cast, sizeof, POINTER, create_string_buffer, addressof
 import fcntl
 import os
 import sys
@@ -25,7 +25,7 @@ BLOCKSIZE = 16
 
 """
 This is the Data class.
-No need to do write it like a c structure.
+No need to do implement it like a c structure.
 """
 class Data:
     def __init__(self, inp, iv, key):
@@ -51,7 +51,7 @@ def initsess(mydata, sess, fd):
 def encrypt(mydata, sess, cryp, fd):
     try:
         cryp.ses = c_uint32(sess.ses)
-        cryp.lend = sizeof(mydata.inpt)
+        cryp.len = sizeof(mydata.inpt)
         cryp.src = cast(mydata.inpt, POINTER(c_uint8))
         cryp.dst = cast(mydata.encrypted, POINTER(c_uint8))
         cryp.iv = cast(mydata.iv, POINTER(c_uint8))
@@ -79,11 +79,11 @@ def printMessage(msg1, msg2):
     print msg1 + " (hex)\n%s\n" % hexMsg
     print "*" * 100
 
-
+#Function to get the string from a string buffer by keeping all non null characters of the string
 def getString(buf):
     return "".join(c for c in buf if c != '\0')
 
-# Usefull function to generate random string
+# useful function to generate random string
 def randomString(size, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 

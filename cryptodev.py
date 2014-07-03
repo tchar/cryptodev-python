@@ -1,23 +1,23 @@
 """
 First attempt to build a python binding to
-communicate with cryptodev using ctypes
-ioctlh contains usefull functions in python
-equivalent to ioctl.h's header:
-http://lxr.free-electrons.com/source/include/uapi/asm-generic/ioctl.h#L79
-Copy of ioctlh can be found here:
+communicate with cryptodev using ctypes.
+ioctl contains useful functions in python
+equivalent to ioctl.h, which can be found at:
+http://lxr.free-electrons.com/source/include/uapi/asm-generic/ioctl.h
+Copy of ioctl.py can be found here:
 from http://code.activestate.com/recipes/578225-linux-ioctl-numbers-in-python/
-Created by Dima Tisnek
+ioctl.py created by Dima Tisnek
 
 Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 """
 
-# Import usefull libs
-from ctypes import *
-import ioctlh
+# Import useful libs
+from ctypes import c_uint16, c_uint32, c_uint8, c_char, sizeof, POINTER, Structure
+import ioctl
 
 """
-Defined variables from cryptodev.h needed
-to encrypt/decrypt etc.
+Defined constants from cryptodev.h needed
+to encrypt/decrypt, etc.
 """
 # API extensions for linux
 CRYPTO_HMAC_MAX_KEY_LEN = 512
@@ -128,7 +128,7 @@ class crypt_op(Structure):
     _fields_ = [("ses",  c_uint32),
                 ("op", c_uint16),
                 ("flags", c_uint16),
-                ("lend", c_uint32),
+                ("len", c_uint32),
                 ("src", POINTER(c_uint8)),
                 ("dst", POINTER(c_uint8)),
                 ("mac", POINTER(c_uint8)),
@@ -138,7 +138,7 @@ class crypt_auth_op(Structure):
     _fields_ = [("ses", c_uint32),
                 ("op", c_uint16),
                 ("flags", c_uint16),
-                ("lend", c_uint32),
+                ("len", c_uint32),
                 ("auth_len", c_uint32),
                 ("auth_src", POINTER(c_uint8)),
                 ("src", POINTER(c_uint8)),
@@ -256,23 +256,23 @@ CRF_DH_COMPUTE_KEY = (1 << CRK_DH_COMPUTE_KEY)
 
 # ioctl's. Compatible with old linux cryptodev.h
 
-CRIOGET = ioctlh._IOWR(ord('c'), 101, sizeof(c_uint32))
-CIOCGSESSION = ioctlh._IOWR(ord('c'), 102, sizeof(session_op))
-CIOCFSESSION = ioctlh._IOW(ord('c'), 103, sizeof(c_uint32))
-CIOCCRYPT = ioctlh._IOWR(ord('c'), 104, sizeof(crypt_op))
-CIOCKEY = ioctlh._IOWR(ord('c'), 105, sizeof(crypt_kop))
-CIOCASYMFEAT = ioctlh._IOR(ord('c'), 106, sizeof(c_uint32))
-CIOCGSESSINFO = ioctlh._IOWR(ord('c'), 107, sizeof(session_info_op))
+CRIOGET = ioctl._IOWR(ord('c'), 101, sizeof(c_uint32))
+CIOCGSESSION = ioctl._IOWR(ord('c'), 102, sizeof(session_op))
+CIOCFSESSION = ioctl._IOW(ord('c'), 103, sizeof(c_uint32))
+CIOCCRYPT = ioctl._IOWR(ord('c'), 104, sizeof(crypt_op))
+CIOCKEY = ioctl._IOWR(ord('c'), 105, sizeof(crypt_kop))
+CIOCASYMFEAT = ioctl._IOR(ord('c'), 106, sizeof(c_uint32))
+CIOCGSESSINFO = ioctl._IOWR(ord('c'), 107, sizeof(session_info_op))
 
 # to indicate that CRIOGET is not required in linux
 
 CRIOGET_NOT_NEEDED = 1
 
 # additional ioctls for AEAD
-CIOCAUTHCRYPT = ioctlh._IOWR(ord('c'), 109, sizeof(crypt_auth_op))
+CIOCAUTHCRYPT = ioctl._IOWR(ord('c'), 109, sizeof(crypt_auth_op))
 
 # additional ioctls for asynchronous operation.
 # These are conditionally enabled since version 1.6.
 
-CIOCASYNCCRYPT = ioctlh._IOW(ord('c'), 110, sizeof(crypt_op))
-CIOCASYNCFETCH = ioctlh._IOR(ord('c'), 111, sizeof(crypt_op))
+CIOCASYNCCRYPT = ioctl._IOW(ord('c'), 110, sizeof(crypt_op))
+CIOCASYNCFETCH = ioctl._IOR(ord('c'), 111, sizeof(crypt_op))

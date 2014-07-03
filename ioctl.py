@@ -1,7 +1,7 @@
+#!/usr/bin/python2
 # Got it from http://code.activestate.com/recipes/578225-linux-ioctl-numbers-in-python/
 # Created by Dima Tisnek
 
-#!/usr/bin/python2
 """
 Linux ioctl numbers made easy
 
