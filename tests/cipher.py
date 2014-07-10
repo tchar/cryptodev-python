@@ -1,7 +1,7 @@
-from ctypes import create_string_buffer, addressof, memset, sizeof, cast, c_ulong, c_char, c_char_p, c_int, c_uint32, POINTER, pointer, memmove, CDLL, c_uint64
+from ctypes import create_string_buffer, addressof, memset, sizeof, cast, c_char_p, c_int, c_uint32, POINTER, byref, memmove, CDLL
 from cryptodev import *
-from fcntl import ioctl, fcntl, F_SETFD
-from os import open, close, O_RDWR, strerror
+from fcntl import F_SETFD
+from os import open, close, O_RDWR
 from traceback import format_exc
 
 libc = CDLL("libc.so.6")
@@ -28,23 +28,23 @@ def test_crypto(cfd):
         if debug:
             print "running %s\n" % __func__
 
-        memset(addressof(sess), 0, sizeof(sess))
-        memset(addressof(cryp), 0, sizeof(cryp))
+        memset(byref(sess), 0, sizeof(sess))
+        memset(byref(cryp), 0, sizeof(cryp))
 
-        memset(addressof(key), 0x33,  sizeof(key))
-        memset(addressof(iv), 0x03,  sizeof(iv))
+        memset(byref(key), 0x33,  sizeof(key))
+        memset(byref(iv), 0x03,  sizeof(iv))
         # Get crypto session for AES128
         sess.cipher = CRYPTO_AES_CBC
         sess.keylen = KEY_SIZE
         sess.key = cast(key, POINTER(c_uint8))
-        if ioctl(cfd, CIOCGSESSION, addressof(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
 #ifdef CIOCGSESSINFO
         siop.ses = sess.ses
-        if ioctl(cfd, CIOCGSESSINFO, addressof(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
             #perror("ioctl(CIOCGSESSINFO)")
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -56,8 +56,8 @@ def test_crypto(cfd):
         ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
 
 #else
-        #plaintext.value = addressof(plaintext_raw)
-        #ciphertext.value = addressof(ciphertext_raw)
+        #plaintext.value = byref(plaintext_raw)
+        #ciphertext.value = byref(ciphertext_raw)
 
 #endif
         memset(plaintext, 0x15, DATA_SIZE)
@@ -70,23 +70,23 @@ def test_crypto(cfd):
         cryp.iv = cast(iv, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
 
-        if ioctl(cfd, CIOCCRYPT, addressof(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
 
-        if ioctl(cfd, CIOCFSESSION, addressof(sess) + session_op.ses.offset) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess), session_op.ses.offset) != 0:
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
 
-        if ioctl(cfd, CIOCGSESSION, addressof(sess)) !=0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) !=0:
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
         siop.ses = sess.ses
-        if ioctl(cfd, CIOCGSESSINFO, addressof(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
             #perror("ioctl(CIOCGSESSINFO)")
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -102,7 +102,7 @@ def test_crypto(cfd):
         cryp.iv = cast(iv, POINTER(c_uint8))
         cryp.op = COP_DECRYPT
 
-        if ioctl(cfd, CIOCCRYPT, addressof(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
@@ -119,7 +119,7 @@ def test_crypto(cfd):
             print "Test passed"
 
         # Finish crypto session
-        if ioctl(cfd, CIOCFSESSION, addressof(sess) + session_op.ses.offset) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -147,21 +147,21 @@ def test_aes(cfd):
         siop =  session_info_op()
         cryp = crypt_op()
 
-        memset(addressof(sess), 0, sizeof(sess));
-        memset(addressof(cryp), 0, sizeof(cryp));
+        memset(byref(sess), 0, sizeof(sess));
+        memset(byref(cryp), 0, sizeof(cryp));
 
         # Get crypto session for AES128.
         sess.cipher = CRYPTO_AES_CBC
         sess.keylen = KEY_SIZE
         sess.key = cast(key1, POINTER(c_uint8))
-        if ioctl(cfd, CIOCGSESSION, addressof(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
 #ifdef CIOCGSESSINFO
         siop.ses = sess.ses;
-        if ioctl(cfd, CIOCGSESSINFO, addressof(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
             #perror("ioctl(CIOCGSESSINFO)")
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -169,10 +169,10 @@ def test_aes(cfd):
         #plaintext1 = (char *)(((unsigned long)plaintext1_raw + siop.alignmask) & ~siop.alignmask);
         plaintext1.value = (addressof(plaintext1_raw) + siop.alignmask) & ~siop.alignmask
 #else
-        #plaintext1.value = addressof(plaintext1_raw)
+        #plaintext1.value = byref(plaintext1_raw)
 #endif
         memset(plaintext1, 0x0, BLOCK_SIZE)
-        memset(addressof(iv1), 0x0, sizeof(iv1))
+        memset(byref(iv1), 0x0, sizeof(iv1))
         # Encrypt data.in to data.encrypted
         cryp.ses = sess.ses
         cryp.len = BLOCK_SIZE
@@ -180,7 +180,7 @@ def test_aes(cfd):
         cryp.dst = cast(plaintext1, POINTER(c_uint8))
         cryp.iv = cast(iv1, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
-        if ioctl(cfd, CIOCCRYPT, addressof(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
@@ -192,21 +192,21 @@ def test_aes(cfd):
 
         # Test 2
 
-        memset(addressof(key2), 0x0, sizeof(key2))
-        memset(addressof(iv2), 0x0, sizeof(iv2))
+        memset(byref(key2), 0x0, sizeof(key2))
+        memset(byref(iv2), 0x0, sizeof(iv2))
 
         # Get crypto session for AES128
         sess.cipher = CRYPTO_AES_CBC
         sess.keylen = KEY_SIZE
         sess.key = cast(key2, POINTER(c_uint8))
-        if ioctl(cfd, CIOCGSESSION, addressof(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
 #ifdef CIOCGSESSINFO
         siop.ses = sess.ses;
-        if ioctl(cfd, CIOCGSESSINFO, addressof(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
             #perror("ioctl(CIOCGSESSINFO)")
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -217,9 +217,9 @@ def test_aes(cfd):
         #plaintext2 = (char *)(((unsigned long)plaintext2_raw + siop.alignmask) & ~siop.alignmask);
         plaintext2.value = (addressof(plaintext2_raw) + siop.alignmask) & ~siop.alignmask
 #else
-        #plaintext2 = c_char_p(addressof(plaintext2_raw))
+        #plaintext2 = c_char_p(byref(plaintext2_raw))
 #endif
-        memmove(plaintext2, addressof(plaintext2_data), BLOCK_SIZE);
+        memmove(plaintext2, byref(plaintext2_data), BLOCK_SIZE);
 
         # Encrypt data.in to data.encrypted
         cryp.ses = sess.ses;
@@ -228,7 +228,7 @@ def test_aes(cfd):
         cryp.dst = cast(plaintext2, POINTER(c_uint8))
         cryp.iv = cast(iv2, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
-        if ioctl(cfd, CIOCCRYPT, addressof(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
@@ -246,7 +246,7 @@ def test_aes(cfd):
             print "AES Test passed"
 
         # Finish crypto session
-        if ioctl(cfd, CIOCFSESSION, addressof(sess) + session_op.ses.offset) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -254,44 +254,45 @@ def test_aes(cfd):
         return True
     except Exception,e:
         print str(e)
+        print format_exc()
         return False
 
 def main():
     try:
 
         cfd = c_int()
+        fd = c_int()
         cfd.value = -1
 
         #if (argc > 1) debug = 1;
 
         # Open the crypto device
-        fd = open("/dev/crypto", O_RDWR, 0)
+        fd.value = open("/dev/crypto", O_RDWR, 0)
         # Clone file descriptorn
-        # Using c_uint64(addressof()) instead of addressof because OverFlowError raises
+        # Using c_uint64(byref()) instead of byref because OverFlowError raises
         # http://hg.python.org/cpython/file/bc6d28e726d8/Python/getargs.c#l658
-        if libc.ioctl(fd, CRIOGET, c_uint64(addressof(cfd))) != 0:
+        if libc.ioctl(fd.value, CRIOGET, byref(cfd)) != 0:
             #perror("ioctl(CRIOGET)")
             print "ioctl(CRIOGET) error"
             return False
-        cfd = cfd.value
         # Set close-on-exec (not really neede here)
-        if fcntl(cfd, F_SETFD, 1) == -1:
+        if libc.fcntl(cfd.value, F_SETFD, 1) == -1:
             #perror("fcntl(F_SETFD)")
             print "fcntl(F_SETFD) error"
             return False
 
         #Run the test itself
-        if test_aes(cfd) == False:
+        if test_aes(cfd.value) == False:
             return False
 
-        if test_crypto(cfd) == False:
+        if test_crypto(cfd.value) == False:
             return False
 
         # Close cloned descriptor
-        close(cfd)
+        close(cfd.value)
 
         # Close the original descriptor
-        close(fd)
+        close(fd.value)
 
         return True
     except OSError, e:
