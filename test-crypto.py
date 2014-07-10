@@ -41,7 +41,7 @@ def initsess(mydata, sess, fd):
         sess.cipher = c_uint32(CRYPTO_AES_CBC)
         sess.keylen = c_uint32(KEYSIZE)
         sess.key = cast(mydata.key, POINTER(c_uint8))
-        fcntl.ioctl(fd, CIOCGSESSION, addressof(sess))
+        print fcntl.ioctl(fd, CIOCGSESSION, addressof(sess))
     except OSError, e:
         print str(e)
         sys.exit(1)
