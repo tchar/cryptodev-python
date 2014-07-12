@@ -1,3 +1,27 @@
+'''
+This is a python rip from cipher.c.
+Some usefull info following:
+We are using libc's ioctl and fcnt instead of fcntl's because sometimes addressof
+returns really big numbers. This causes problems to fcntl's ioctl (for more follow the link below):
+http://hg.python.org/cpython/file/bc6d28e726d8/Python/getargs.c#l658
+We use libc's ioctl/fcntl because fcntl's ioctl/fcntl won't accent ctypes' byref().
+Brief documentation of byref, addressof and POINTER usage:
+    byref:      Used to pass any reference (light pointer() object) to ioctl/fcntl.
+                Used when calling libc's ioctl and not fcntl's ioctl
+    addressof:  Used to get the real address of a ctypes object. This is only used
+                to translate specific c code into Python code (c code is similar to the following):
+                plaintext = (char *)(((unsigned long)plaintext_raw + siop.alignmask) & ~siop.alignmask);
+    POINTER:    Used to cast a ctypes object into a POINTER object (of a ctype object).
+                Mostly used to cast into POINTER(c_uint8)
+
+Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
+'''
+'''
+Demo on how to use /dev/crypto device for ciphering.
+
+Placed under public domain.
+
+'''
 from ctypes import create_string_buffer, addressof, memset, sizeof, cast, c_char_p, c_int, c_uint32, POINTER, byref, memmove, CDLL
 from cryptodev import *
 from fcntl import F_SETFD
@@ -108,12 +132,12 @@ def test_crypto(cfd):
             return False
 
         # Verify the result.
-        if plaintext.value != ciphertext.value:
+        if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
             print "plaintext:"
-            print plaintext.value
+            print plaintext.value[:DATA_SIZE]
             print "ciphertext:"
-            print ciphertext.value
+            print ciphertext.value[:DATA_SIZE]
             return False
         elif debug:
             print "Test passed"
@@ -186,7 +210,7 @@ def test_aes(cfd):
             return False
 
         # Verify the result
-        if plaintext1.value != ciphertext1.value:
+        if plaintext1.value[:BLOCK_SIZE] != ciphertext1.value[:BLOCK_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
             return False
 
@@ -234,7 +258,7 @@ def test_aes(cfd):
             return False
 
         # Verify the result
-        if plaintext2.value != ciphertext2.value:
+        if plaintext2.value[:BLOCK_SIZE] != ciphertext2.value[:BLOCK_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
             printf("plaintext:");
             print ":".join("{:02x}".format(ord(c)) for c in plaintext2.value)
@@ -269,8 +293,6 @@ def main():
         # Open the crypto device
         fd.value = open("/dev/crypto", O_RDWR, 0)
         # Clone file descriptorn
-        # Using c_uint64(byref()) instead of byref because OverFlowError raises
-        # http://hg.python.org/cpython/file/bc6d28e726d8/Python/getargs.c#l658
         if libc.ioctl(fd.value, CRIOGET, byref(cfd)) != 0:
             #perror("ioctl(CRIOGET)")
             print "ioctl(CRIOGET) error"
