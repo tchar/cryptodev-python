@@ -1,5 +1,5 @@
 '''
-This is a python rip from cipher-aead.c.
+This is a Python rip from cipher-aead.c.
 Some useful info following:
 We are using libc's ioctl and fcnt instead of fcntl's because sometimes addressof()
 returns really big numbers. This causes problems to fcntl's ioctl (for more follow the link below):
@@ -8,11 +8,11 @@ fcntl's ioctl/fcntl won't accent ctypes' byref() (another reason to use libc's i
 Brief documentation of byref(), addressof() and POINTER() usage:
     byre()f:    Used to pass any reference (light pointer() object) to ioctl/fcntl.
                 Used when calling libc's ioctl and not fcntl's ioctl
-    addressof():Used to get the real address of a ctypes object. This is only used
-                to translate specific c code into Python code (c code is similar to the following):
+    addressof():Used to get the real address of a ctypes object. This is used only
+                when translate specific C code into Python code (C code is similar to the following):
                 plaintext = (char *)(((unsigned long)plaintext_raw + siop.alignmask) & ~siop.alignmask);
     POINTER():  Used to cast a ctypes object into a POINTER object (of a ctype object).
-                Mostly used to cast into POINTER(c_uint8)
+                Mostly used when casting to POINTER(c_uint8)
 
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 '''
