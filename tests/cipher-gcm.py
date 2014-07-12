@@ -9,7 +9,7 @@ Brief documentation of byref(), addressof() and POINTER() usage:
     byref():    Used to pass any reference (light pointer() object) to ioctl/fcntl.
                 Used when calling libc's ioctl and not fcntl's ioctl
     addressof():Used to get the real address of a ctypes object. This is used only
-                when translate specific C code into Python code (C code is similar to the following):
+                when translating specific C code into Python code (C code is similar to the following):
                 plaintext = (char *)(((unsigned long)plaintext_raw + siop.alignmask) & ~siop.alignmask);
     POINTER():  Used when casting a ctypes object to a POINTER object (of a ctype object).
                 Mostly used when casting to POINTER(c_uint8)
