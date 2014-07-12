@@ -144,7 +144,7 @@ def test_crypto(cfd):
             return False
 
         if debug:
-            print "requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s\n" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+            print "requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
 
         plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
         ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask

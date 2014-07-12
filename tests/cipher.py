@@ -36,7 +36,6 @@ BLOCK_SIZE = 16
 KEY_SIZE = 16
 
 def test_crypto(cfd):
-    __func__ = "test crypto"
     try:
 
         plaintext_raw = create_string_buffer(DATA_SIZE + 63)
@@ -49,8 +48,6 @@ def test_crypto(cfd):
         sess = session_op()
         siop = session_info_op()
         cryp = crypt_op()
-        if debug:
-            print "running %s\n" % __func__
 
         memset(byref(sess), 0, sizeof(sess))
         memset(byref(cryp), 0, sizeof(cryp))
@@ -67,22 +64,24 @@ def test_crypto(cfd):
             return False
 
 #ifdef CIOCGSESSINFO
-        siop.ses = sess.ses
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
-            #perror("ioctl(CIOCGSESSINFO)")
-            print "ioctl(CIOCGSESSINFO) error"
-            return False
+        try:
+            siop.ses = sess.ses
+            if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+                #perror("ioctl(CIOCGSESSINFO)")
+                print "ioctl(CIOCGSESSINFO) error"
+                return False
 
-        if debug:
-            print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+            if debug:
+                print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
 
-        plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
-        ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
-
-#else
-        #plaintext.value = byref(plaintext_raw)
-        #ciphertext.value = byref(ciphertext_raw)
-
+            plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
+            ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
+ #else
+        #plaintext = plaintext_raw
+        #ciphertext = ciphertext_raw
+        except NameError:
+            plaintext.value = addressof(plaintext_raw)
+            ciphertext.value = addressof(ciphertext_raw)
 #endif
         memset(plaintext, 0x15, DATA_SIZE)
 
@@ -184,16 +183,19 @@ def test_aes(cfd):
             return False
 
 #ifdef CIOCGSESSINFO
-        siop.ses = sess.ses;
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
-            #perror("ioctl(CIOCGSESSINFO)")
-            print "ioctl(CIOCGSESSINFO) error"
-            return False
+        try:
+            siop.ses = sess.ses;
+            if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+                #perror("ioctl(CIOCGSESSINFO)")
+                print "ioctl(CIOCGSESSINFO) error"
+                return False
 
-        #plaintext1 = (char *)(((unsigned long)plaintext1_raw + siop.alignmask) & ~siop.alignmask);
-        plaintext1.value = (addressof(plaintext1_raw) + siop.alignmask) & ~siop.alignmask
+            #plaintext1 = (char *)(((unsigned long)plaintext1_raw + siop.alignmask) & ~siop.alignmask);
+            plaintext1.value = (addressof(plaintext1_raw) + siop.alignmask) & ~siop.alignmask
 #else
-        #plaintext1.value = byref(plaintext1_raw)
+        #plaintext1 = plaintext1_raw
+        except NameError:
+            plaintext1.value = addressof(plaintext1_raw)
 #endif
         memset(plaintext1, 0x0, BLOCK_SIZE)
         memset(byref(iv1), 0x0, sizeof(iv1))
@@ -229,19 +231,22 @@ def test_aes(cfd):
             return False
 
 #ifdef CIOCGSESSINFO
-        siop.ses = sess.ses;
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
-            #perror("ioctl(CIOCGSESSINFO)")
-            print "ioctl(CIOCGSESSINFO) error"
-            return False
+        try:
+            siop.ses = sess.ses;
+            if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+                #perror("ioctl(CIOCGSESSINFO)")
+                print "ioctl(CIOCGSESSINFO) error"
+                return False
 
-        if debug:
-            print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+            if debug:
+                print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
 
-        #plaintext2 = (char *)(((unsigned long)plaintext2_raw + siop.alignmask) & ~siop.alignmask);
-        plaintext2.value = (addressof(plaintext2_raw) + siop.alignmask) & ~siop.alignmask
+            #plaintext2 = (char *)(((unsigned long)plaintext2_raw + siop.alignmask) & ~siop.alignmask);
+            plaintext2.value = (addressof(plaintext2_raw) + siop.alignmask) & ~siop.alignmask
 #else
-        #plaintext2 = c_char_p(byref(plaintext2_raw))
+        #plaintext2 = plaintext2_raw
+        except NameError:
+            plaintext2.value = addressof(plaintext2_raw)
 #endif
         memmove(plaintext2, byref(plaintext2_data), BLOCK_SIZE);
 
