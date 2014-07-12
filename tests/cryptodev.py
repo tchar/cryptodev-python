@@ -111,12 +111,12 @@ class session_info_op(Structure):
                 ("flags", c_uint32)]    # SIOP_FLAGS_*
 
 """
-    If this flag is set then this algorithm uses
-    a driver only available in kernel (software drivers,
-    or drivers based on instruction sets do not set this flag).
+If this flag is set then this algorithm uses
+a driver only available in kernel (software drivers,
+or drivers based on instruction sets do not set this flag).
 
-    If multiple algorithms are involved (as in AEAD case), then
-    if one of them is kernel-driver-only this flag will be set.
+If multiple algorithms are involved (as in AEAD case), then
+if one of them is kernel-driver-only this flag will be set.
 """
 
 SIOP_FLAG_KERNEL_DRIVER_ONLY = 1
@@ -149,53 +149,53 @@ class crypt_auth_op(Structure):
                 ("iv_len", c_uint32)]
 
 """
-    In plain AEAD mode the following are required:
-    flags   : 0
-    iv      : the initialization vector (12 bytes)
-    auth_len: the length of the data to be authenticated
-    auth_src: the data to be authenticated
-    len     : length of data to be encrypted
-    src     : the data to be encrypted
-    dst     : space to hold encrypted data. It must have
-              at least a size of len + tag_size.
-    tag_size: the size of the desired authentication tag or zero to use
-              the maximum tag output.
+In plain AEAD mode the following are required:
+flags   : 0
+iv      : the initialization vector (12 bytes)
+auth_len: the length of the data to be authenticated
+auth_src: the data to be authenticated
+len     : length of data to be encrypted
+src     : the data to be encrypted
+dst     : space to hold encrypted data. It must have
+          at least a size of len + tag_size.
+tag_size: the size of the desired authentication tag or zero to use
+          the maximum tag output.
 
-    Note tag isn't being used because the Linux AEAD interface
-    copies the tag just after data.
+Note tag isn't being used because the Linux AEAD interface
+copies the tag just after data.
 """
 
 """
-    In TLS mode (used for CBC ciphers that required padding)
-    the following are required:
-    flags   : COP_FLAG_AEAD_TLS_TYPE
-    iv      : the initialization vector
-    auth_len: the length of the data to be authenticated only
-    len     : length of data to be encrypted
-    auth_src: the data to be authenticated
-    src     : the data to be encrypted
-    dst     : space to hold encrypted data (preferably in-place). It must have
-              at least a size of len + tag_size + blocksize.
-    tag_size: the size of the desired authentication tag or zero to use
-              the default mac output.
+In TLS mode (used for CBC ciphers that required padding)
+the following are required:
+flags   : COP_FLAG_AEAD_TLS_TYPE
+iv      : the initialization vector
+auth_len: the length of the data to be authenticated only
+len     : length of data to be encrypted
+auth_src: the data to be authenticated
+src     : the data to be encrypted
+dst     : space to hold encrypted data (preferably in-place). It must have
+          at least a size of len + tag_size + blocksize.
+tag_size: the size of the desired authentication tag or zero to use
+          the default mac output.
 
-    Note that the padding used is the minimum padding.
+Note that the padding used is the minimum padding.
 """
 
 """
-    In SRTP mode the following are required:
-    flags   : COP_FLAG_AEAD_SRTP_TYPE
-    iv      : the initialization vector
-    auth_len: the length of the data to be authenticated. This must
-              include the SRTP header + SRTP payload (data to be encrypted) + rest
+In SRTP mode the following are required:
+flags   : COP_FLAG_AEAD_SRTP_TYPE
+iv      : the initialization vector
+auth_len: the length of the data to be authenticated. This must
+          include the SRTP header + SRTP payload (data to be encrypted) + rest
 
-    len     : length of data to be encrypted
-    auth_src: pointer the data to be authenticated. Should point at the same buffer as src.
-    src     : pointer to the data to be encrypted.
-    dst     : This is mandatory to be the same as src (in-place only).
-    tag_size: the size of the desired authentication tag or zero to use
-              the default mac output.
-    tag     : Pointer to an address where the authentication tag will be copied.
+len     : length of data to be encrypted
+auth_src: pointer the data to be authenticated. Should point at the same buffer as src.
+src     : pointer to the data to be encrypted.
+dst     : This is mandatory to be the same as src (in-place only).
+tag_size: the size of the desired authentication tag or zero to use
+          the default mac output.
+tag     : Pointer to an address where the authentication tag will be copied.
 """
 
 # struct crypt_op flags
@@ -213,9 +213,9 @@ COP_FLAG_RESET = (1 << 6) # multi-update reset the state.
                                           # with COP_FLAG_UPDATE
 
 """
-    Stuff for bignum arithmetic and public key
-    cryptography - not supported yet by linux
-    cryptodev.
+Stuff for bignum arithmetic and public key
+cryptography - not supported yet by linux
+cryptodev.
 """
 
 CRYPTO_ALG_FLAG_SUPPORTED = 1
