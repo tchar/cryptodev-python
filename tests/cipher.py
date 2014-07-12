@@ -265,10 +265,8 @@ def test_aes(cfd):
         # Verify the result
         if plaintext2.value[:BLOCK_SIZE] != ciphertext2.value[:BLOCK_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
-            printf("plaintext:");
-            print ":".join("{:02x}".format(ord(c)) for c in plaintext2.value)
-            printf("ciphertext:");
-            print ":".join("{:02x}".format(ord(c)) for c in ciphertext2.value)
+            print"plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext2.value)
+            print"ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext2.value)
             return False
 
         if debug:

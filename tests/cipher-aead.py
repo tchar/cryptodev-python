@@ -96,8 +96,7 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         return False
 
 def print_buf(desc, buf, size):
-    print desc
-    print ":".join("{:02x}".format(ord(c)) for c in buf.value[:size])
+    print desc + "".join("{:02x}".format(ord(c)) for c in buf.value[:size])
 
 def test_crypto(cfd):
     try:
@@ -154,8 +153,6 @@ def test_crypto(cfd):
             print "SHA1 MAC failed"
             return False
 
-        #print "after sha1mac: " + ":".join("{:02x}".format(tmp[i]) for i in xrange(20))
-
         memmove(ciphertext, plaintext, DATA_SIZE);
 
         # Encrypt data.in to data.encrypted
@@ -199,22 +196,16 @@ def test_crypto(cfd):
         co.dst = cast(ciphertext, POINTER(c_uint8))
         co.iv = cast(iv, POINTER(c_uint8))
         co.op = COP_DECRYPT
-        #print "before"
-        #print ":".join("{:02x}".format(ord(c)) for c in ciphertext.value)
         if libc.ioctl(cfd, CIOCCRYPT, byref(co)) != 0:
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
 
-        #print "after"
-        #print ":".join("{:02x}".format(ord(c)) for c in ciphertext.value)
         # Verify the result
         if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
-            print "plaintext:"
-            print ":".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
-            print "ciphertext:"
-            print ":".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
+            print "plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
+            print "ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
             return False
 
         pad = ord(ciphertext.value[cao.len - 1])
@@ -366,10 +357,8 @@ def test_encrypt_decrypt(cfd):
         # Verify the result
         if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
             print "FAIL: Decrypted data are different from the input data."
-            print "plaintext:"
-            print ":".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
-            printf("ciphertext:");
-            print ":".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
+            print "plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
+            print "ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
             return False
 
         if debug:
