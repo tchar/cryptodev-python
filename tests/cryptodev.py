@@ -13,7 +13,7 @@ Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 
 # Import useful libs
 from ctypes import c_uint16, c_uint32, c_uint8, c_char, sizeof, POINTER, Structure
-import ioctl
+from ioctl import _IOR, _IOW, _IOWR
 
 """
 Defined constants from cryptodev.h needed
@@ -256,23 +256,23 @@ CRF_DH_COMPUTE_KEY = (1 << CRK_DH_COMPUTE_KEY)
 
 # ioctl's. Compatible with old linux cryptodev.h
 
-CRIOGET = ioctl._IOWR(ord('c'), 101, sizeof(c_uint32))
-CIOCGSESSION = ioctl._IOWR(ord('c'), 102, sizeof(session_op))
-CIOCFSESSION = ioctl._IOW(ord('c'), 103, sizeof(c_uint32))
-CIOCCRYPT = ioctl._IOWR(ord('c'), 104, sizeof(crypt_op))
-CIOCKEY = ioctl._IOWR(ord('c'), 105, sizeof(crypt_kop))
-CIOCASYMFEAT = ioctl._IOR(ord('c'), 106, sizeof(c_uint32))
-CIOCGSESSINFO = ioctl._IOWR(ord('c'), 107, sizeof(session_info_op))
+CRIOGET = _IOWR(ord('c'), 101, sizeof(c_uint32))
+CIOCGSESSION = _IOWR(ord('c'), 102, sizeof(session_op))
+CIOCFSESSION = _IOW(ord('c'), 103, sizeof(c_uint32))
+CIOCCRYPT = _IOWR(ord('c'), 104, sizeof(crypt_op))
+CIOCKEY = _IOWR(ord('c'), 105, sizeof(crypt_kop))
+CIOCASYMFEAT = _IOR(ord('c'), 106, sizeof(c_uint32))
+CIOCGSESSINFO = _IOWR(ord('c'), 107, sizeof(session_info_op))
 
 # to indicate that CRIOGET is not required in linux
 
 CRIOGET_NOT_NEEDED = 1
 
 # additional ioctls for AEAD
-CIOCAUTHCRYPT = ioctl._IOWR(ord('c'), 109, sizeof(crypt_auth_op))
+CIOCAUTHCRYPT = _IOWR(ord('c'), 109, sizeof(crypt_auth_op))
 
 # additional ioctls for asynchronous operation.
 # These are conditionally enabled since version 1.6.
 
-CIOCASYNCCRYPT = ioctl._IOW(ord('c'), 110, sizeof(crypt_op))
-CIOCASYNCFETCH = ioctl._IOR(ord('c'), 111, sizeof(crypt_op))
+CIOCASYNCCRYPT = _IOW(ord('c'), 110, sizeof(crypt_op))
+CIOCASYNCFETCH = _IOR(ord('c'), 111, sizeof(crypt_op))
