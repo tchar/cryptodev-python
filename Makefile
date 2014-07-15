@@ -3,3 +3,7 @@ python-bindings: cryptodev.py
 
 cryptodev.py:
 	python ctypesgen/ctypesgen.py  --insert-file crypto/fix.py crypto/cryptodev.h -o crypto/cryptodev.py
+
+clean:
+	rm -f crypto/cryptodev.py*
+	rm -f tests/cryptodev.py*
