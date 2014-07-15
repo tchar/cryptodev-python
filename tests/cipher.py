@@ -11,7 +11,7 @@ Brief documentation of byref(), addressof() and POINTER() usage:
     addressof():Used to get the real address of a ctypes object. This is used only
                 when translating specific C code into Python code (C code is similar to the following):
                 plaintext = (char *)(((unsigned long)plaintext_raw + siop.alignmask) & ~siop.alignmask);
-    POINTE()R:  Used to cast a ctypes object into a POINTER object (of a ctype object).
+    POINTE()R:  Used when casting a ctypes object to a POINTER object (of a ctype object).
                 Mostly used when casting to POINTER(c_uint8)
 
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>

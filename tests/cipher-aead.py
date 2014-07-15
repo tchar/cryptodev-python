@@ -6,12 +6,12 @@ returns really big numbers. This causes problems to fcntl's ioctl (for more foll
 http://hg.python.org/cpython/file/bc6d28e726d8/Python/getargs.c#l659
 fcntl's ioctl/fcntl won't accent ctypes' byref() (another reason to use libc's ioctl/fcntl).
 Brief documentation of byref(), addressof() and POINTER() usage:
-    byre()f:    Used to pass any reference (light pointer() object) to ioctl/fcntl.
+    byref():    Used to pass any reference (light pointer() object) to ioctl/fcntl.
                 Used when calling libc's ioctl and not fcntl's ioctl
     addressof():Used to get the real address of a ctypes object. This is used only
-                when translate specific C code into Python code (C code is similar to the following):
+                when translating specific C code into Python code (C code is similar to the following):
                 plaintext = (char *)(((unsigned long)plaintext_raw + siop.alignmask) & ~siop.alignmask);
-    POINTER():  Used to cast a ctypes object into a POINTER object (of a ctype object).
+    POINTER():  Used when casting a ctypes object to a POINTER object (of a ctype object).
                 Mostly used when casting to POINTER(c_uint8)
 
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
