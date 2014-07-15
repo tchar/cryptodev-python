@@ -1,7 +1,7 @@
-'''Wrapper for ioctl.h
+'''Wrapper for demolib.h
 
 Generated with:
-ctypesgen.py /usr/include/linux/ioctl.h -o ioctl.py
+../ctypesgen.py -o pydemolib.py -l demolib.so demolib.h
 
 Do not modify this file.
 '''
@@ -342,7 +342,6 @@ _libdirs = []
 # ----------------------------------------------------------------------------
 
 import os.path, re, sys, glob
-import platform
 import ctypes
 import ctypes.util
 
@@ -477,21 +476,7 @@ class PosixLibraryLoader(LibraryLoader):
         try: directories.extend([dir.strip() for dir in open('/etc/ld.so.conf')])
         except IOError: pass
 
-        unix_lib_dirs_list = ['/lib', '/usr/lib', '/lib64', '/usr/lib64']
-        if sys.platform.startswith('linux'):
-            # Try and support multiarch work in Ubuntu
-            # https://wiki.ubuntu.com/MultiarchSpec
-            bitage = platform.architecture()[0]
-            if bitage.startswith('32'):
-                # Assume Intel/AMD x86 compat
-                unix_lib_dirs_list += ['/lib/i386-linux-gnu', '/usr/lib/i386-linux-gnu']
-            elif bitage.startswith('64'):
-                # Assume Intel/AMD x86 compat
-                unix_lib_dirs_list += ['/lib/x86_64-linux-gnu', '/usr/lib/x86_64-linux-gnu']
-            else:
-                # guess...
-                unix_lib_dirs_list += glob.glob('/lib/*linux-gnu')
-        directories.extend(unix_lib_dirs_list)
+        directories.extend(['/lib', '/usr/lib', '/lib64', '/usr/lib64'])
 
         cache = {}
         lib_re = re.compile(r'lib(.*)\.s[ol]')
@@ -602,181 +587,20 @@ del loaderclass
 
 add_library_search_dirs([])
 
-# No libraries
+# Begin libraries
+
+_libs["demolib.so"] = load_library("demolib.so")
+
+# 1 libraries
+# End libraries
 
 # No modules
 
-# /usr/include/asm-generic/ioctl.h: 22
-try:
-    _IOC_NRBITS = 8
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 23
-try:
-    _IOC_TYPEBITS = 8
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 31
-try:
-    _IOC_SIZEBITS = 14
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 35
-try:
-    _IOC_DIRBITS = 2
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 38
-try:
-    _IOC_NRMASK = ((1 << _IOC_NRBITS) - 1)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 39
-try:
-    _IOC_TYPEMASK = ((1 << _IOC_TYPEBITS) - 1)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 40
-try:
-    _IOC_SIZEMASK = ((1 << _IOC_SIZEBITS) - 1)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 41
-try:
-    _IOC_DIRMASK = ((1 << _IOC_DIRBITS) - 1)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 43
-try:
-    _IOC_NRSHIFT = 0
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 44
-try:
-    _IOC_TYPESHIFT = (_IOC_NRSHIFT + _IOC_NRBITS)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 45
-try:
-    _IOC_SIZESHIFT = (_IOC_TYPESHIFT + _IOC_TYPEBITS)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 46
-try:
-    _IOC_DIRSHIFT = (_IOC_SIZESHIFT + _IOC_SIZEBITS)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 54
-try:
-    _IOC_NONE = 0
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 58
-try:
-    _IOC_WRITE = 1
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 62
-try:
-    _IOC_READ = 2
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 65
-def _IOC(dir, type, nr, size):
-    return ((((dir << _IOC_DIRSHIFT) | (type << _IOC_TYPESHIFT)) | (nr << _IOC_NRSHIFT)) | (size << _IOC_SIZESHIFT))
-
-# /usr/include/asm-generic/ioctl.h: 71
-def _IOC_TYPECHECK(t):
-    return sizeof(t)
-
-# /usr/include/asm-generic/ioctl.h: 74
-def _IO(type, nr):
-    return (_IOC (_IOC_NONE, type, nr, 0))
-
-# /usr/include/asm-generic/ioctl.h: 75
-def _IOR(type, nr, size):
-    return (_IOC (_IOC_READ, type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 76
-def _IOW(type, nr, size):
-    return (_IOC (_IOC_WRITE, type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 77
-def _IOWR(type, nr, size):
-    return (_IOC ((_IOC_READ | _IOC_WRITE), type, nr, (_IOC_TYPECHECK (size))))
-
-# /usr/include/asm-generic/ioctl.h: 78
-def _IOR_BAD(type, nr, size):
-    return (_IOC (_IOC_READ, type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 79
-def _IOW_BAD(type, nr, size):
-    return (_IOC (_IOC_WRITE, type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 80
-def _IOWR_BAD(type, nr, size):
-    return (_IOC ((_IOC_READ | _IOC_WRITE), type, nr, sizeof(size)))
-
-# /usr/include/asm-generic/ioctl.h: 83
-def _IOC_DIR(nr):
-    return ((nr >> _IOC_DIRSHIFT) & _IOC_DIRMASK)
-
-# /usr/include/asm-generic/ioctl.h: 84
-def _IOC_TYPE(nr):
-    return ((nr >> _IOC_TYPESHIFT) & _IOC_TYPEMASK)
-
-# /usr/include/asm-generic/ioctl.h: 85
-def _IOC_NR(nr):
-    return ((nr >> _IOC_NRSHIFT) & _IOC_NRMASK)
-
-# /usr/include/asm-generic/ioctl.h: 86
-def _IOC_SIZE(nr):
-    return ((nr >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
-
-# /usr/include/asm-generic/ioctl.h: 90
-try:
-    IOC_IN = (_IOC_WRITE << _IOC_DIRSHIFT)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 91
-try:
-    IOC_OUT = (_IOC_READ << _IOC_DIRSHIFT)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 92
-try:
-    IOC_INOUT = ((_IOC_WRITE | _IOC_READ) << _IOC_DIRSHIFT)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 93
-try:
-    IOCSIZE_MASK = (_IOC_SIZEMASK << _IOC_SIZESHIFT)
-except:
-    pass
-
-# /usr/include/asm-generic/ioctl.h: 94
-try:
-    IOCSIZE_SHIFT = _IOC_SIZESHIFT
-except:
-    pass
+# /home/clach04/dev/python/ctypesgen/demo/demolib.h: 6
+if hasattr(_libs['demolib.so'], 'trivial_add'):
+    trivial_add = _libs['demolib.so'].trivial_add
+    trivial_add.argtypes = [c_int, c_int]
+    trivial_add.restype = c_int
 
 # No inserted files
 
