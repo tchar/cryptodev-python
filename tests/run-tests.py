@@ -1,4 +1,5 @@
 from os import system, path,listdir
+from sys import executable
 tests = ["async_cipher.py", "async_hmac.py", "async_speed.py",
 			"cipher-aead-srtp.py", "cipher-aead.py", "cipher-gcm.py",
 			"cipher.py", "cipher_comp.py", "fullspeed.py",
@@ -12,7 +13,7 @@ def main():
 			print 40 * "="
 			print "Running " + f
 			print 40 * "="
-			system("python " + f)
+			system(executable + " " + f)
 			print ""
 		print 40 * "="
 	except Exception, e:
