@@ -51,7 +51,7 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = key_size
         sess.mackey = cast(key, POINTER(c_uint8))
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
@@ -65,7 +65,7 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         cryp.mac = cast(mac, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
         cryp.flags = COP_FLAG_UPDATE
-        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
@@ -78,13 +78,13 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         cryp.mac = cast(mac, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
         cryp.flags = COP_FLAG_FINAL
-        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
 
         # Finish crypto session
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -131,13 +131,13 @@ def test_crypto(cfd):
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
         sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
         siop.ses = sess.ses
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
             #perror("ioctl(CIOCGSESSINFO)");
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -166,14 +166,14 @@ def test_crypto(cfd):
         cao.op = COP_ENCRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
-        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)) != 0:
+        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
             #perror("ioctl(CIOCAUTHCRYPT)")
             print "ioctl(CIOCAUTHCRYPT) error"
             return False
 
         #print "Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, cao.len)
 
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -184,7 +184,7 @@ def test_crypto(cfd):
         sess.keylen = KEY_SIZE
         sess.key = cast(key, POINTER(c_uint8))
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
@@ -196,7 +196,7 @@ def test_crypto(cfd):
         co.dst = cast(ciphertext, POINTER(c_uint8))
         co.iv = cast(iv, POINTER(c_uint8))
         co.op = COP_DECRYPT
-        if libc.ioctl(cfd, CIOCCRYPT, byref(co)) != 0:
+        if libc.ioctl(cfd, CIOCCRYPT, byref(co)):
             #perror("ioctl(CIOCCRYPT)")
             print "ioctl(CIOCCRYPT) error"
             return False
@@ -228,7 +228,7 @@ def test_crypto(cfd):
 
 
         # Finish crypto session
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -272,13 +272,13 @@ def test_encrypt_decrypt(cfd):
         sess.mackeylen = 16
         sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
         siop.ses = sess.ses
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
             #perror("ioctl(CIOCGSESSINFO)");
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -308,7 +308,7 @@ def test_encrypt_decrypt(cfd):
         cao.op = COP_ENCRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
-        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)) != 0:
+        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
             #perror("ioctl(CIOCAUTHCRYPT)")
             print "ioctl(CIOCAUTHCRYPT)"
             return False
@@ -316,7 +316,7 @@ def test_encrypt_decrypt(cfd):
         enc_len = cao.len
         # print "Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, enc_len)
 
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -330,7 +330,7 @@ def test_encrypt_decrypt(cfd):
         sess.mackeylen = 16
         sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
@@ -345,7 +345,7 @@ def test_encrypt_decrypt(cfd):
         cao.iv = cast(iv, POINTER(c_uint8))
         cao.op = COP_DECRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
-        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)) != 0:
+        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
             #perror("ioctl(CIOCAUTHCRYPT)")
             print "ioctl(CIOCAUTHCRYPT)"
             return False
@@ -366,7 +366,7 @@ def test_encrypt_decrypt(cfd):
 
 
         # Finish crypto session
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -411,13 +411,13 @@ def test_encrypt_decrypt_error(cfd, err):
         sess.mackeylen = 16
         sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
 
         siop.ses = sess.ses
-        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
             #perror("ioctl(CIOCGSESSINFO)")
             print "ioctl(CIOCGSESSINFO) error"
             return False
@@ -444,7 +444,7 @@ def test_encrypt_decrypt_error(cfd, err):
         cao.op = COP_ENCRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
-        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)) != 0:
+        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
             #perror("ioctl(CIOCAUTHCRYPT)")
             print "ioctl(CIOCAUTHCRYPT) error"
             return False
@@ -452,7 +452,7 @@ def test_encrypt_decrypt_error(cfd, err):
         enc_len = cao.len
         # printf("Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, enc_len)
 
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -466,7 +466,7 @@ def test_encrypt_decrypt_error(cfd, err):
         sess.mackeylen = 16
         sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) != 0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION)"
             return False
@@ -488,8 +488,8 @@ def test_encrypt_decrypt_error(cfd, err):
         cao.iv = cast(iv, POINTER(c_uint8))
         cao.op = COP_DECRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
-        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)) != 0:
-            if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
+            if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
                 #perror("ioctl(CIOCFSESSION)")
                 print "ioctl(CIOCFSESSION) error"
                 return False
@@ -500,7 +500,7 @@ def test_encrypt_decrypt_error(cfd, err):
             return True
 
         # Finish crypto session
-        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)) != 0:
+        if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
             print "ioctl(CIOCFSESSION) error"
             return False
@@ -521,7 +521,7 @@ def main():
         fd.value = open("/dev/crypto", O_RDWR, 0)
 
         # Clone file descriptor
-        if libc.ioctl(fd.value, CRIOGET, byref(cfd)) != 0:
+        if libc.ioctl(fd.value, CRIOGET, byref(cfd)):
             #perror("ioctl(CRIOGET)")
             print "ioctl(CRIOGET) error"
             return False
