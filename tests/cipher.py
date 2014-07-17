@@ -103,7 +103,7 @@ def test_crypto(cfd):
             print "ioctl(CIOCFSESSION) error"
             return False
 
-        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)) !=0:
+        if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
             print "ioctl(CIOCGSESSION) error"
             return False
