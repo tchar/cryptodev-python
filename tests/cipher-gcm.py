@@ -16,12 +16,6 @@ Brief documentation of byref(), addressof() and POINTER() usage:
 
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 '''
-'''
-Demo on how to use /dev/crypto device for ciphering.
-
-Placed under public domain.
-
-'''
 
 from cryptodev import *
 from ctypes import POINTER, byref, addressof, Structure, c_uint8, c_int, create_string_buffer, c_int8, c_char_p, cast, c_byte, CDLL, memset, memmove
