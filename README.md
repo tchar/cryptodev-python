@@ -1,7 +1,13 @@
 cryptodev-python
 ================
-Project to create C bindings for cryptodev in Python (v2.7) semi-automatically.
 
+Acknowledgment
+--------------
+I want to thank Vangelis Koukis for motivating me into developing this project.
+
+About
+-----
+This is a project to create C bindings for cryptodev in Python (v2.7) semi-automatically.
 This branch provides a way to create the bindings dynamically using Python ctypesgen.
 To generate the module run:
 make python-bindings
@@ -10,18 +16,20 @@ The bindings are basically a Python module named cryptodev (under crypto). The m
 
 How to build/use?
 -----------------
-To build this, fork the ctypesgen project, from mine repository or the developers repository (links provided below).
-Then assign to the variable CTYPESGEN, located in this project’s Makefile, the ctypesgen.py location.
-Type make.
-Go into tests folder, where a cryptodev module folder was just created.
-To run the tests you can use the script run_tests.py like: python run_tests.py
-To clean the project type: make clean.
+To build this, fork the ctypesgen project, from mine repository or the developers repository (links provided below).  
+Then assign to the variable CTYPESGEN, located in this project’s Makefile, the ctypesgen.py location.  
+Type: ```make```  
+Go into tests folder, where a cryptodev module folder was just created.  
+To run the tests you can use the script run_tests.py like: ```python run_tests.py```  
+Note that you must run the script using python 2.7 version, not 3.  
+To clean the project type: ```make clean```  
 
 
 cryptodev/ctypesgen
 -------------------
-You can find cryptodev at: https://github.com/cryptodev-linux/cryptodev-linux/
-You can find ctypesgen at: https://code.google.com/p/ctypesgen/ or at my repository (advised): https://github.com/tchar/ctypesgen/
+You can find cryptodev at: https://github.com/cryptodev-linux/cryptodev-linux/  
+You can find ctypesgen at: https://code.google.com/p/ctypesgen/  
+or at my repository (advised): https://github.com/tchar/ctypesgen/
 
 Why not fully-automated way?
 ----------------------------
@@ -37,5 +45,5 @@ Concluding, ctypesgen cannot parse a definition in which we use another definiti
 Note that something like the following works:
 ```C
 #define SOMEOTHERDEFINE(x) sizeof(x) //This is basically _IOC_TYPECHECK definition of ioctl.h
-#define THISDEFINE(x) SOMEOTHERDEFINE(x) //This is like CRIOGET, but more simple as an example
+#define THISDEFINE(x) SOMEOTHERDEFINE(x)
 ```
