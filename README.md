@@ -18,7 +18,7 @@ How to run the tests?
 You need the cryptodev module installed (link provided below).  
 Navigate into the tests folder and run the script run_tests.py as:  
 ```python run_tests.py```.  
-Note that you must run the script using python 2.7 version, not 3.
+Note that you must run the script using python 2.7 version and above (now supporting python 3).
 
 cryptodev
 ---------
