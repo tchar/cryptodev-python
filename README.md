@@ -7,7 +7,7 @@ I want to thank Vangelis Koukis for motivating me into developing this project.
 
 About
 -----
-This is a project to create C bindings for cryptodev in Python (v2.7).  
+This is a project to create C bindings for cryptodev in Python.  
 The bindings are basically a Python module named cryptodev (under crypto).  
 The module contains two Python files: ioctl.py and cryptodev.py translated from ioctl.h and cryptodev.h respectively.  
 To use the module just import cryptodev (e.g. from cryptodev import *).  
