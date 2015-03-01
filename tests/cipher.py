@@ -17,6 +17,8 @@ Brief documentation of byref(), addressof() and POINTER() usage:
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 '''
 
+import sys
+sys.path.append('../crypto/cryptodev')
 from ctypes import create_string_buffer, addressof, memset, sizeof, cast, c_char_p, c_int, c_uint32, POINTER, byref, memmove, CDLL
 from cryptodev import *
 from fcntl import F_SETFD
@@ -25,6 +27,7 @@ from traceback import format_exc
 
 libc = CDLL("libc.so.6")
 debug = True;
+enc = 'utf-8'
 
 DATA_SIZE = 8*1024
 BLOCK_SIZE = 16
@@ -54,20 +57,19 @@ def test_crypto(cfd):
         sess.keylen = KEY_SIZE
         sess.key = cast(key, POINTER(c_uint8))
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print("ioctl(CIOCGSESSION) error")
             return False
 
 #ifdef CIOCGSESSINFO
         try:
             siop.ses = sess.ses
             if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-                #perror("ioctl(CIOCGSESSINFO)")
-                print "ioctl(CIOCGSESSINFO) error"
+                print("ioctl(CIOCGSESSINFO) error")
                 return False
 
             if debug:
-                print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+                print("requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name.decode(enc)
+                    , siop.cipher_info.cra_driver_name.decode(enc)))
 
             plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
             ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
@@ -89,28 +91,25 @@ def test_crypto(cfd):
         cryp.op = COP_ENCRYPT
 
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print("ioctl(CIOCCRYPT) error")
             return False
 
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess), session_op.ses.offset):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print("ioctl(CIOCFSESSION) error")
             return False
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print("ioctl(CIOCGSESSION) error")
             return False
 
         siop.ses = sess.ses
         if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-            #perror("ioctl(CIOCGSESSINFO)")
-            print "ioctl(CIOCGSESSINFO) error"
+            print("ioctl(CIOCGSESSINFO) error")
             return False
 
         if debug:
-            print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+            print("requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name.decode(enc)
+                , siop.cipher_info.cra_driver_name.decode(enc)))
 
         # Decrypt data.encrypted to data.decrypted.
         cryp.ses = sess.ses
@@ -122,42 +121,41 @@ def test_crypto(cfd):
 
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
             #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print("ioctl(CIOCCRYPT) error")
             return False
 
         # Verify the result.
         if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
-            print "FAIL: Decrypted data are different from the input data."
-            print "plaintext:"
-            print plaintext.value[:DATA_SIZE]
-            print "ciphertext:"
-            print ciphertext.value[:DATA_SIZE]
+            print("FAIL: Decrypted data are different from the input data.")
+            print("plaintext:")
+            print(plaintext.value[:DATA_SIZE])
+            print("ciphertext:")
+            print(ciphertext.value[:DATA_SIZE])
             return False
         elif debug:
-            print "Test passed"
+            print("Test passed")
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print("ioctl(CIOCFSESSION) error")
             return False
 
         return True
-    except Exception, e:
-        print format_exc()
+    except Exception as e:
+        print(format_exc())
         return False
 
 def test_aes(cfd):
     try:
         plaintext1_raw = create_string_buffer(BLOCK_SIZE + 63)
         plaintext1 = c_char_p()
-        ciphertext1 = create_string_buffer("".join([chr(0xdf), chr(0x55), chr(0x6a), chr(0x33), chr(0x43), chr(0x8d), chr(0xb8), chr(0x7b), chr(0xc4), chr(0x1b), chr(0x17), chr(0x52), chr(0xc5), chr(0x5e), chr(0x5e), chr(0x49)]), BLOCK_SIZE)
+        ciphertext1 = create_string_buffer(bytes(bytearray([0xdf, 0x55, 0x6a, 0x33, 0x43, 0x8d, 0xb8, 0x7b, 0xc4, 0x1b, 0x17, 0x52, 0xc5, 0x5e, 0x5e, 0x49])), BLOCK_SIZE)
         iv1 = create_string_buffer(BLOCK_SIZE)
-        key1 = create_string_buffer("".join([chr(0xff), chr(0xff), chr(0xc0), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00), chr(0x00)]), KEY_SIZE)
-        plaintext2_data = create_string_buffer("".join([chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xff), chr(0xc0), chr(0x00)]), BLOCK_SIZE)
+        key1 = create_string_buffer(bytes(bytearray([0xff, 0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])), KEY_SIZE)
+        plaintext2_data = create_string_buffer(bytes(bytearray([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00])), BLOCK_SIZE)
         plaintext2_raw = create_string_buffer(BLOCK_SIZE + 63)
         plaintext2 = c_char_p()
-        ciphertext2 = create_string_buffer("".join([chr(0xb7), chr(0x97), chr(0x2b), chr(0x39), chr(0x41), chr(0xc4), chr(0x4b), chr(0x90), chr(0xaf), chr(0xa7), chr(0xb2), chr(0x64), chr(0xbf), chr(0xba), chr(0x73), chr(0x87)]), BLOCK_SIZE)
+        ciphertext2 = create_string_buffer(bytes(bytearray([0xb7, 0x97, 0x2b, 0x39, 0x41, 0xc4, 0x4b, 0x90, 0xaf, 0xa7, 0xb2, 0x64, 0xbf, 0xba, 0x73, 0x87])), BLOCK_SIZE)
         iv2 = create_string_buffer(BLOCK_SIZE)
         key2 =  create_string_buffer(KEY_SIZE)
 
@@ -174,15 +172,14 @@ def test_aes(cfd):
         sess.key = cast(key1, POINTER(c_uint8))
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
             #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print("ioctl(CIOCGSESSION) error")
             return False
 
 #ifdef CIOCGSESSINFO
         try:
             siop.ses = sess.ses;
             if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-                #perror("ioctl(CIOCGSESSINFO)")
-                print "ioctl(CIOCGSESSINFO) error"
+                print("ioctl(CIOCGSESSINFO) error")
                 return False
 
             #plaintext1 = (char *)(((unsigned long)plaintext1_raw + siop.alignmask) & ~siop.alignmask);
@@ -202,13 +199,12 @@ def test_aes(cfd):
         cryp.iv = cast(iv1, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print("ioctl(CIOCCRYPT) error")
             return False
 
         # Verify the result
         if plaintext1.value[:BLOCK_SIZE] != ciphertext1.value[:BLOCK_SIZE]:
-            print "FAIL: Decrypted data are different from the input data."
+            print("FAIL: Decrypted data are different from the input data.")
             return False
 
         # Test 2
@@ -221,20 +217,19 @@ def test_aes(cfd):
         sess.keylen = KEY_SIZE
         sess.key = cast(key2, POINTER(c_uint8))
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print("ioctl(CIOCGSESSION) error")
             return False
 
 #ifdef CIOCGSESSINFO
         try:
             siop.ses = sess.ses;
             if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-                #perror("ioctl(CIOCGSESSINFO)")
-                print "ioctl(CIOCGSESSINFO) error"
+                print("ioctl(CIOCGSESSINFO) error")
                 return False
 
             if debug:
-                print "requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+                print("requested cipher CRYPTO_AES_CBC, got %s with driver %s" % (siop.cipher_info.cra_name.decode(enc)
+                    , siop.cipher_info.cra_driver_name.decode(enc)))
 
             #plaintext2 = (char *)(((unsigned long)plaintext2_raw + siop.alignmask) & ~siop.alignmask);
             plaintext2.value = (addressof(plaintext2_raw) + siop.alignmask) & ~siop.alignmask
@@ -253,30 +248,30 @@ def test_aes(cfd):
         cryp.iv = cast(iv2, POINTER(c_uint8))
         cryp.op = COP_ENCRYPT
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print("ioctl(CIOCCRYPT) error")
             return False
 
         # Verify the result
         if plaintext2.value[:BLOCK_SIZE] != ciphertext2.value[:BLOCK_SIZE]:
-            print "FAIL: Decrypted data are different from the input data."
-            print"plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext2.value)
-            print"ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext2.value)
+            print("FAIL: Decrypted data are different from the input data.")
+            print("plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext2.value))
+            print("ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext2.value))
             return False
 
         if debug:
-            print "AES Test passed"
+            print("AES Test passed")
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
             #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print("ioctl(CIOCFSESSION) error")
             return False
 
         return True
-    except Exception,e:
-        print str(e)
-        print format_exc()
+    #Just for debugging
+    except Exception as e:
+        print(str(e))
+        print(format_exc())
         return False
 
 def main():
@@ -293,12 +288,12 @@ def main():
         # Clone file descriptorn
         if libc.ioctl(fd.value, CRIOGET, byref(cfd)):
             #perror("ioctl(CRIOGET)")
-            print "ioctl(CRIOGET) error"
+            print("ioctl(CRIOGET) error")
             return False
         # Set close-on-exec (not really neede here)
         if libc.fcntl(cfd.value, F_SETFD, 1) == -1:
             #perror("fcntl(F_SETFD)")
-            print "fcntl(F_SETFD) error"
+            print("fcntl(F_SETFD) error")
             return False
 
         #Run the test itself
@@ -315,8 +310,8 @@ def main():
         close(fd.value)
 
         return True
-    except OSError, e:
-        print str(e)
+    except OSError as e:
+        print(str(e))
         return False
 
 if __name__ == "__main__":

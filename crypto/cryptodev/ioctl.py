@@ -12,9 +12,9 @@ for example include/linux/watchdog.h:
 #define WATCHDOG_IOCTL_BASE     'W'
 
 struct watchdog_info {
-        __u32 options;          /* Options the card/driver supports */
-        __u32 firmware_version; /* Firmware version of the card */
-        __u8  identity[32];     /* Identity of the board */
+		__u32 options;          /* Options the card/driver supports */
+		__u32 firmware_version; /* Firmware version of the card */
+		__u8  identity[32];     /* Identity of the board */
 };
 
 #define WDIOC_GETSUPPORT  _IOR(WATCHDOG_IOCTL_BASE, 0, struct watchdog_info)
@@ -26,6 +26,7 @@ WDIOC_GETSUPPORT = _IOR(ord('W'), 0, "=II32s")
 
 """
 import struct
+import sys
 # constant for linux portability
 _IOC_NRBITS = 8
 _IOC_TYPEBITS = 8
@@ -50,12 +51,18 @@ _IOC_READ = 2
 
 
 def _IOC(dir, type, nr, size):
-    if isinstance(size, str) or isinstance(size, unicode):
-        size = struct.calcsize(size)
-    return dir  << _IOC_DIRSHIFT  | \
-           type << _IOC_TYPESHIFT | \
-           nr   << _IOC_NRSHIFT   | \
-           size << _IOC_SIZESHIFT
+	#python 3
+	if sys.version_info[0] == 3:
+		if isinstance(size, str):
+			size = struct.calcsize(size)
+	#python 2
+	else:
+		if isinstance(size, str) or isinstance(size, unicode):
+			size = struct.calcsize(size)
+	return dir  << _IOC_DIRSHIFT  | \
+		   type << _IOC_TYPESHIFT | \
+		   nr   << _IOC_NRSHIFT   | \
+		   size << _IOC_SIZESHIFT
 
 
 def _IO(type, nr): return _IOC(_IOC_NONE, type, nr, 0)

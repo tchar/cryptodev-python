@@ -17,13 +17,15 @@ Brief documentation of byref(), addressof() and POINTER() usage:
 Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 '''
 
+import sys
+sys.path.append('../crypto/cryptodev')
 from cryptodev import *
 from ctypes import CDLL, byref, sizeof, POINTER, c_uint8, create_string_buffer, memset, c_uint, c_char_p, cast, addressof, memmove, c_ubyte, c_byte
 from os import open, O_RDWR, close
 from fcntl import F_SETFD
 from traceback import format_exc
 
-libc = CDLL("libc.so.6")
+libc = CDLL('libc.so.6')
 DATA_SIZE = 8*1024
 AUTH_SIZE = 31
 BLOCK_SIZE = 16
@@ -32,6 +34,7 @@ KEY_SIZE = 16
 MAC_SIZE = 20 # SHA1
 
 debug = True
+enc = 'utf-8'
 
 def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac):
     try:
@@ -46,8 +49,7 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         sess.mackeylen = key_size
         sess.mackey = cast(key, POINTER(c_uint8))
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         # Encrypt data.in to data.encrypted
@@ -60,8 +62,7 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         cryp.op = COP_ENCRYPT
         cryp.flags = COP_FLAG_UPDATE
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print('ioctl(CIOCCRYPT) error')
             return False
 
         cryp.ses = sess.ses
@@ -73,24 +74,23 @@ def get_sha1_hmac(cfd, key, key_size, data1, data1_size, data2, data2_size, mac)
         cryp.op = COP_ENCRYPT
         cryp.flags = COP_FLAG_FINAL
         if libc.ioctl(cfd, CIOCCRYPT, byref(cryp)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print('ioctl(CIOCCRYPT) error')
             return False
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         return True
-    except Exception, e:
-        print str(e)
-        print format_exc()
+    #For debugging
+    except Exception as e:
+        print(str(e))
+        print(format_exc())
         return False
 
 def print_buf(desc, buf, size):
-    print desc + "".join("{:02x}".format(ord(c)) for c in buf.value[:size])
+    print(desc + ''.join('{:02x}'.format(ord(c)) for c in buf.value[:size]))
 
 def test_crypto(cfd):
     try:
@@ -124,27 +124,26 @@ def test_crypto(cfd):
 
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
-        sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
+        sess.mackey = cast(create_string_buffer(b'\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b', sess.mackeylen), POINTER(c_uint8))
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         siop.ses = sess.ses
         if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-            #perror("ioctl(CIOCGSESSINFO)");
-            print "ioctl(CIOCGSESSINFO) error"
+            print('ioctl(CIOCGSESSINFO) error')
             return False
 
         if debug:
-            print "requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
+            print('requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s' % (siop.cipher_info.cra_name.decode(enc)
+                , siop.cipher_info.cra_driver_name.decode(enc)))
 
         plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
         ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
         memset(plaintext, 0x15, DATA_SIZE)
 
         if get_sha1_hmac(cfd, sess.mackey, sess.mackeylen, auth, sizeof(auth), plaintext, DATA_SIZE, sha1mac) != True:
-            print "SHA1 MAC failed"
+            print('SHA1 MAC failed')
             return False
 
         memmove(ciphertext, plaintext, DATA_SIZE);
@@ -161,15 +160,13 @@ def test_crypto(cfd):
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
         if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
-            #perror("ioctl(CIOCAUTHCRYPT)")
-            print "ioctl(CIOCAUTHCRYPT) error"
+            print('ioctl(CIOCAUTHCRYPT) error')
             return False
 
-        #print "Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, cao.len)
+        #print('Original plaintext size: %d, ciphertext: %d' % (DATA_SIZE, cao.len)
 
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         # Get crypto session for AES128
@@ -179,8 +176,7 @@ def test_crypto(cfd):
         sess.key = cast(key, POINTER(c_uint8))
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         # Decrypt data.encrypted to data.decrypted
@@ -191,46 +187,53 @@ def test_crypto(cfd):
         co.iv = cast(iv, POINTER(c_uint8))
         co.op = COP_DECRYPT
         if libc.ioctl(cfd, CIOCCRYPT, byref(co)):
-            #perror("ioctl(CIOCCRYPT)")
-            print "ioctl(CIOCCRYPT) error"
+            print('ioctl(CIOCCRYPT) error')
             return False
 
         # Verify the result
         if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
-            print "FAIL: Decrypted data are different from the input data."
-            print "plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
-            print "ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
+            print('FAIL: Decrypted data are different from the input data.')
+            print('plaintext:' + ''.join('{:02x}'.format(ord(c)) for c in plaintext.value[:DATA_SIZE]))
+            print('ciphertext:' + ''.join('{:02x}'.format(ord(c)) for c in ciphertext.value[:DATA_SIZE]))
             return False
 
-        pad = ord(ciphertext.value[cao.len - 1])
+        if sys.version_info[0] == 3:
+            pad = ciphertext.value[cao.len - 1]
+        else:
+            pad = ord(ciphertext.value[cao.len - 1])
         offset = cao.len - MAC_SIZE - pad - 1
         if ciphertext.value[offset : 20 + offset] != sha1mac.value[:20]:
-            print "AEAD SHA1 MAC does not match plain MAC"
-            print_buf("SHA1: ", sha1mac, 20)
-            print_buf("SHA1-TLS: ", create_string_buffer(ciphertext.value[offset:]), 20)
+            print('AEAD SHA1 MAC does not match plain MAC')
+            print_buf('SHA1: ', sha1mac, 20)
+            print_buf('SHA1-TLS: ', create_string_buffer(ciphertext.value[offset:]), 20)
             return False
 
 
-        for i in xrange(pad):
-            if ord(ciphertext.value[cao.len-1-i]) != pad:
-                print "Pad does not match (expected %d)" % pad
-                print_buf("PAD: ", create_string_buffer(ciphertext.value[cao.len - 1 - pad:]), pad)
+        for i in range(pad):
+            if sys.version_info[0] == 3:
+                check_pad = ciphertext.value[cao.len-1-i] != pad
+            else:
+                check_pad = ord(ciphertext.value[cao.len-1-i]) != pad
+            if check_pad:
+                print('Pad does not match (expected %d)' % pad)
+                print_buf('PAD: ', create_string_buffer(ciphertext.value[cao.len - 1 - pad:]), pad)
                 return False
 
         if debug:
-            print "Test passed"
+            print('Test passed')
 
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         return True
-    except Exception, e:
-        print str(e)
-        print format_exc()
+
+    #For debugging
+    except Exception as e:
+        print(str(e))
+        print(format_exc())
         return False
 
 def test_encrypt_decrypt(cfd):
@@ -264,29 +267,25 @@ def test_encrypt_decrypt(cfd):
 
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
-        sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
+        sess.mackey = cast(create_string_buffer(b'\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b', sess.mackeylen), POINTER(c_uint8))
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         siop.ses = sess.ses
         if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-            #perror("ioctl(CIOCGSESSINFO)");
-            print "ioctl(CIOCGSESSINFO) error"
+            print('ioctl(CIOCGSESSINFO) error')
             return False
 
-        #print "requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
-
+        
         plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
         ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
 
         memset(plaintext, 0x15, DATA_SIZE)
 
         if get_sha1_hmac(cfd, sess.mackey, sess.mackeylen, auth, sizeof(auth), plaintext, DATA_SIZE, sha1mac) != True:
-            #fprintf(stderr, "SHA1 MAC failed\n");
-            print "SHA1 MAC failed"
+            print('SHA1 MAC failed')
             return False
 
         memmove(ciphertext, plaintext, DATA_SIZE)
@@ -303,16 +302,14 @@ def test_encrypt_decrypt(cfd):
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
         if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
-            #perror("ioctl(CIOCAUTHCRYPT)")
-            print "ioctl(CIOCAUTHCRYPT)"
+            print('ioctl(CIOCAUTHCRYPT)')
             return False
 
         enc_len = cao.len
-        # print "Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, enc_len)
+        # print('Original plaintext size: %d, ciphertext: %d' % (DATA_SIZE, enc_len)
 
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         # Get crypto session for AES128
@@ -322,11 +319,10 @@ def test_encrypt_decrypt(cfd):
         sess.key = cast(key, POINTER(c_uint8))
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
-        sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
+        sess.mackey = cast(create_string_buffer(b'\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b', sess.mackeylen), POINTER(c_uint8))
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         # Decrypt data.encrypted to data.decrypted
@@ -340,35 +336,34 @@ def test_encrypt_decrypt(cfd):
         cao.op = COP_DECRYPT
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
         if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
-            #perror("ioctl(CIOCAUTHCRYPT)")
-            print "ioctl(CIOCAUTHCRYPT)"
+            print('ioctl(CIOCAUTHCRYPT)')
             return False
 
         if cao.len != DATA_SIZE:
-            print "decrypted data size incorrect!"
+            print('decrypted data size incorrect!')
             return False
 
         # Verify the result
         if plaintext.value[:DATA_SIZE] != ciphertext.value[:DATA_SIZE]:
-            print "FAIL: Decrypted data are different from the input data."
-            print "plaintext:" + "".join("{:02x}".format(ord(c)) for c in plaintext.value[:DATA_SIZE])
-            print "ciphertext:" + "".join("{:02x}".format(ord(c)) for c in ciphertext.value[:DATA_SIZE])
+            print('FAIL: Decrypted data are different from the input data.')
+            print('plaintext:' + ''.join('{:02x}'.format(ord(c)) for c in plaintext.value[:DATA_SIZE]))
+            print('ciphertext:' + ''.join('{:02x}'.format(ord(c)) for c in ciphertext.value[:DATA_SIZE]))
             return False
 
         if debug:
-            print "Test passed"
+            print('Test passed')
 
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         return True
-    except Exception, e:
-        print str(e)
-        print format_exc()
+    #For debuggign
+    except Exception as e:
+        print(str(e))
+        print(format_exc())
         return False
 
 
@@ -403,26 +398,23 @@ def test_encrypt_decrypt_error(cfd, err):
 
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
-        sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
+        sess.mackey = cast(create_string_buffer(b'\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b', sess.mackeylen), POINTER(c_uint8))
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION) error"
+            print('ioctl(CIOCGSESSION) error')
             return False
 
         siop.ses = sess.ses
         if libc.ioctl(cfd, CIOCGSESSINFO, byref(siop)):
-            #perror("ioctl(CIOCGSESSINFO)")
-            print "ioctl(CIOCGSESSINFO) error"
+            print('ioctl(CIOCGSESSINFO) error')
             return False
-        # print "requested cipher CRYPTO_AES_CBC/HMAC-SHA1, got %s with driver %s\n" % (siop.cipher_info.cra_name, siop.cipher_info.cra_driver_name)
-
+       
         plaintext.value = (addressof(plaintext_raw) + siop.alignmask) & ~siop.alignmask
         ciphertext.value = (addressof(ciphertext_raw) + siop.alignmask) & ~siop.alignmask
         memset(plaintext, 0x15, DATA_SIZE)
 
         if get_sha1_hmac(cfd, sess.mackey, sess.mackeylen, auth, sizeof(auth), plaintext, DATA_SIZE, sha1mac) != True:
-            print "SHA1 MAC failed"
+            print('SHA1 MAC failed')
             return False
 
         memmove(ciphertext, plaintext, DATA_SIZE)
@@ -439,16 +431,14 @@ def test_encrypt_decrypt_error(cfd, err):
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
 
         if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
-            #perror("ioctl(CIOCAUTHCRYPT)")
-            print "ioctl(CIOCAUTHCRYPT) error"
+            print('ioctl(CIOCAUTHCRYPT) error')
             return False
 
         enc_len = cao.len
-        # printf("Original plaintext size: %d, ciphertext: %d" % (DATA_SIZE, enc_len)
+        # printf('Original plaintext size: %d, ciphertext: %d' % (DATA_SIZE, enc_len)
 
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
         # Get crypto session for AES128
@@ -458,11 +448,10 @@ def test_encrypt_decrypt_error(cfd, err):
         sess.key = cast(key, POINTER(c_uint8))
         sess.mac = CRYPTO_SHA1_HMAC
         sess.mackeylen = 16
-        sess.mackey = cast(create_string_buffer("\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b", sess.mackeylen), POINTER(c_uint8))
+        sess.mackey = cast(create_string_buffer(b'\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b', sess.mackeylen), POINTER(c_uint8))
 
         if libc.ioctl(cfd, CIOCGSESSION, byref(sess)):
-            #perror("ioctl(CIOCGSESSION)")
-            print "ioctl(CIOCGSESSION)"
+            print('ioctl(CIOCGSESSION)')
             return False
 
         if err == 0:
@@ -484,27 +473,26 @@ def test_encrypt_decrypt_error(cfd, err):
         cao.flags = COP_FLAG_AEAD_TLS_TYPE
         if libc.ioctl(cfd, CIOCAUTHCRYPT, byref(cao)):
             if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-                #perror("ioctl(CIOCFSESSION)")
-                print "ioctl(CIOCFSESSION) error"
+                print('ioctl(CIOCFSESSION) error')
                 return False
 
             if debug:
-                print "Test passed"
+                print('Test passed')
 
             return True
 
         # Finish crypto session
         if libc.ioctl(cfd, CIOCFSESSION, byref(sess, session_op.ses.offset)):
-            #perror("ioctl(CIOCFSESSION)")
-            print "ioctl(CIOCFSESSION) error"
+            print('ioctl(CIOCFSESSION) error')
             return False
 
 
-        print "Modification to ciphertext was not detected"
+        print('Modification to ciphertext was not detected')
         return False
-    except Exception, e:
-        print str(e)
-        print format_exc()
+    #For debugging
+    except Exception as e:
+        print(str(e))
+        print(format_exc())
         return False
 
 def main():
@@ -512,18 +500,16 @@ def main():
         fd, cfd = c_uint(-1), c_uint(-1)
 
         # Open the crypto device
-        fd.value = open("/dev/crypto", O_RDWR, 0)
+        fd.value = open('/dev/crypto', O_RDWR, 0)
 
         # Clone file descriptor
         if libc.ioctl(fd.value, CRIOGET, byref(cfd)):
-            #perror("ioctl(CRIOGET)")
-            print "ioctl(CRIOGET) error"
+            print('ioctl(CRIOGET) error')
             return False
 
         # Set close-on-exec (not really neede here)
         if libc.fcntl(cfd.value, F_SETFD, 1) == -1:
-            #perror("fcntl(F_SETFD)")
-            print "fcntl(F_SETFD) error"
+            print('fcntl(F_SETFD) error')
             return False
 
         # Run the test itself
@@ -546,9 +532,10 @@ def main():
         # Close the original descriptor
         close(fd.value)
 
-    except Exception, e:
-        print str(e)
+    #For debugging
+    except Exception as e:
+        print(str(e))
         return False
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
