@@ -1,5 +1,5 @@
 PYTHON=/usr/bin/python2
-CTYPESGEN=ctypesgen/ctypesgen.py
+CTYPESGEN=$(CTYPESGEN_PATH)/ctypesgen.py
 
 python-bindings: ioctl.py cryptodev.py
 	cp -r crypto/cryptodev tests/
