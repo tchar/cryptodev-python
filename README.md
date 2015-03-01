@@ -29,7 +29,16 @@ cryptodev/ctypesgen
 -------------------
 You can find cryptodev at: https://github.com/cryptodev-linux/cryptodev-linux/  
 You can find ctypesgen at: https://code.google.com/p/ctypesgen/  
-or at my repository (advised): https://github.com/tchar/ctypesgen/
+or at my repository: https://github.com/tchar/ctypesgen/
+
+ctypesgen and python 3 support
+------------------------------
+As for now there is a version of ctypesgen that generates python 3 compatible code:
+https://code.google.com/p/ctypesgen/source/browse/branches/python-3/
+Although, the code generated is supposed to be compatible with python 3, it seems that there are some conflicts.
+For example, there is usage of the constant sys.maxint, which was removed in python 3, etc.
+Because of this, I cannot (currently) support python 3 for cryptodev using ctypesgen.
+In the future, I may supply a workaround or a fix about this issue.
 
 Why not fully-automated way?
 ----------------------------
