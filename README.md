@@ -38,7 +38,7 @@ https://code.google.com/p/ctypesgen/source/browse/branches/python-3/
 Although, the code generated is supposed to be compatible with python 3, it seems that there are some conflicts.
 For example, there is usage of the constant sys.maxint, which was removed in python 3, etc.
 Because of this, I cannot (currently) support python 3 for cryptodev using ctypesgen.
-In the future, I may supply a workaround or a fix about this issue.
+In the future, I may supply a workaround or a fix for this issue.
 
 Why not fully-automated way?
 ----------------------------
