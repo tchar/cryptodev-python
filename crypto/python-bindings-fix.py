@@ -4,8 +4,6 @@ in cryptodevl.h. We do it this way because ctypesgen fail to parse
 these constants from cryptodev. Makefile is used to build the whole
 cryptodev module.
 '''
-# ioctl.py is constructed automatically by ctypesgen (Makefile)
-from ioctl import _IOWR, _IOW, _IOR
 
 CRIOGET         =	_IOWR(ord('c'), 101, __u32)
 CIOCGSESSION    =	_IOWR(ord('c'), 102, struct_session_op)

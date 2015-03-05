@@ -18,7 +18,7 @@ Author: Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 '''
 
 import sys
-sys.path.append('../crypto/cryptodev')
+sys.path.append('../crypto')
 from cryptodev import *
 from ctypes import CDLL, byref, sizeof, POINTER, c_uint8, create_string_buffer, memset, c_uint, c_char_p, cast, addressof, memmove, c_ubyte, c_byte
 from os import open, O_RDWR, close

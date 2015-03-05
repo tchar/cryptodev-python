@@ -17,7 +17,7 @@ Author Tilemachos Charalampous <tilemachos.charalampous@gmail.com>
 from __future__ import print_function
 import sys
 # You can remove this if your cryptodev module is in the same folder
-sys.path.append('../crypto/cryptodev') 
+sys.path.append('../crypto')
 from cryptodev import *
 from ctypes import c_uint8, create_string_buffer, cast, byref, POINTER, CDLL
 import fcntl
@@ -31,7 +31,7 @@ BLOCK_SIZE 	= 16
 KEY_SIZE 	= 16
 
 """
-Below are some custom Exceptions defined 
+Below are some custom Exceptions defined
 that are used in the Crypto class
 """
 class InputException(Exception):
@@ -69,7 +69,7 @@ class Crypto:
 	class Data:
 		"""
 		This is the Data class.
-		Holds information about key, iv, input data, 
+		Holds information about key, iv, input data,
 		encrypted data and decrypted data.
 		"""
 		def __init__(self, key, iv, keysize, blocksize):
@@ -240,7 +240,7 @@ def test():
 	try:
 		# Create a random key, iv and data.
 		key = os.urandom(KEY_SIZE)
-		iv = os.urandom(BLOCK_SIZE)	
+		iv = os.urandom(BLOCK_SIZE)
 		data = os.urandom(BLOCK_SIZE)
 		# Get a new instance of Crypto
 		crypto = new(key, iv)
@@ -259,8 +259,8 @@ def test():
 			print('Test failed')
 		# Close the crypto device
 		crypto.close()
-	except (SessionException, EncryptException, 
-		   DecryptException, OpenCryptoException, 
+	except (SessionException, EncryptException,
+		   DecryptException, OpenCryptoException,
 		   InputException) as e:
 		logging.exception(str(e))
 

@@ -1,15 +1,11 @@
 PYTHON=/usr/bin/python2
 CTYPESGEN=$(CTYPESGEN_PATH)/ctypesgen.py
+PYTHON_BIND_FIX = crypto/python-bindings-fix.py
 
-python-bindings: ioctl.py cryptodev.py
+python-bindings:
+	$(PYTHON) $(CTYPESGEN) --include-symbols="(_IOW|_IOWR|_IOR)" --include=sys/ioctl.h  --insert-file $(PYTHON_BIND_FIX) crypto/cryptodev.h -o crypto/cryptodev.py
 
-cryptodev.py:
-	$(PYTHON) $(CTYPESGEN) --insert-file crypto/fix.py crypto/cryptodev.h -o crypto/cryptodev/cryptodev.py
-
-ioctl.py:
-	$(PYTHON) $(CTYPESGEN) /usr/include/linux/ioctl.h -o crypto/cryptodev/ioctl.py
 
 clean:
-	rm -f crypto/cryptodev/cryptodev.py
-	rm -f crypto/cryptodev/ioctl.py
-	rm -f crypto/cryptodev/*.pyc
+	rm -f crypto/cryptodev.py
+	rm -f crypto/*.pyc
