@@ -43,8 +43,8 @@ In the future, I may supply a workaround or a fix for this issue.
 Why not fully-automated way?
 ----------------------------
 
-Due to a bug in ctypesgen a fix.py (located under crypto) is needed. 
-The file crypto/fix.py contains all the cryptodev.h definitions that depend on the following ioctl.h's definitions: _IOWR, _IOW, _IOR.
+Due to a problem I have with ctypesgen, a fix.py (located under crypto) is needed. 
+The file crypto/python-bindings-fix.py contains all the cryptodev.h definitions that depend on the following ioctl.h's definitions: _IOWR, _IOW, _IOR.
 The reason for this is that ctypesgen cannot parse definitions like the following:
 ```C
 #define THISDEFINE SOMEOTHERDEFINE(int) //This is like CRIOGET, but more simple as an example
